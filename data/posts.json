@@ -1,0 +1,32 @@
+[
+  {
+    "id": "post_1",
+    "title": "Sosial Media Asılılığından Necə Qurtulmaq Olar?",
+    "slug": "sosial-media-asililigindan-qurtulmaq",
+    "categoryId": "cat_social",
+    "content": "Sosial media tətbiqləri bizim diqqətimizi cəlb etmək üçün xüsusi olaraq dizayn edilib. Bildiriş səsləri, sonsuz scroll funksiyası və bəyənmə sayğacları beynimizdə dopamin dövriyyəsini formalaşdırır.\n\nBirinci addım — problemi etiraf etməkdir. Telefon istifadə vaxtınızı izləyən tətbiqlərdən istifadə edərək real rəqəmləri görün. Çoxları gündə 4-5 saatdan çox sosial mediada vaxt keçirdiklərini biləndə təəccüblənir.\n\nKonkret addımlar: bildirişləri söndürün, telefonu yataq otağından kənarda saxlayın, gündəlik ekran vaxtı limiti qoyun və telefonsuz fəaliyyətlər üçün xüsusi vaxt ayırın — gəzinti, kitab oxumaq, dostlarla canlı görüş.\n\nUnutmayın: məqsəd sosial mediadan tam imtina etmək deyil, onunla sağlam münasibət qurmaqdır. Kiçik addımlarla başlayın və özünüzə qarşı mərhəmətli olun.",
+    "metaTitle": "Sosial Media Asılılığından Necə Qurtulmaq Olar? | Tergit.az",
+    "metaDescription": "Sosial media asılılığının səbəbləri və ondan qurtulmaq üçün praktiki addımlar. Ekran vaxtını azaltmaq üçün effektiv strategiyalar.",
+    "metaKeywords": "sosial media asılılığı, ekran vaxtı, telefon asılılığı, instagram asılılığı",
+    "ogImage": "https://picsum.photos/seed/tergit-social/1200/630",
+    "published": true,
+    "createdAt": "2026-06-12T09:50:44.533Z",
+    "updatedAt": "2026-06-12T09:50:44.533Z",
+    "views": 2
+  },
+  {
+    "id": "post_2",
+    "title": "Siqareti Tərk Etmənin Elmi Yolu",
+    "slug": "siqareti-terk-etmenin-elmi-yolu",
+    "categoryId": "cat_smoking",
+    "content": "Nikotin asılılığı bədəndə yalnız 8-12 saniyə ərzində beyinə çatır və bu sürətli effekt onu tərk etməyi xüsusilə çətinləşdirir. Lakin elmi tədqiqatlar göstərir ki, düzgün strategiya ilə uğur şansı kəskin artır.\n\nTərk etmə tarixi təyin edin və ona sadiq qalın. Siqaret çəkmək istəyini tetikləyən vəziyyətləri (stress, qəhvə, alkoqol) qabaqcadan müəyyən edin və həmin anlar üçün alternativ fəaliyyət planlaşdırın.\n\nNikotin əvəzedici terapiya (jiklət, plaster) çəkinmə əlamətlərini xeyli yumşalda bilər. İlk 72 saat ən çətin dövrdür — bədəndəki nikotin tam çıxır və bundan sonra fiziki istək azalmağa başlayır.\n\nDəstək sistemi qurun: ailə, dostlar və ya tərk etmə qrupları prosesi xeyli asanlaşdırır. Hər təkrar uğursuzluq son deyil, sadəcə təcrübədir — çoxları bir neçə cəhddən sonra tam tərk edə bilir.",
+    "metaTitle": "Siqareti Tərk Etmənin Elmi Yolu | Tergit.az",
+    "metaDescription": "Nikotin asılılığının elmi əsasları və siqareti uğurla tərk etmək üçün sübuta əsaslanan strategiyalar.",
+    "metaKeywords": "siqareti tərk etmək, nikotin asılılığı, siqaretdən qurtulmaq",
+    "ogImage": "https://picsum.photos/seed/tergit-smoking/1200/630",
+    "published": true,
+    "createdAt": "2026-06-15T09:50:44.533Z",
+    "updatedAt": "2026-06-15T09:50:44.533Z",
+    "views": 0
+  }
+]
