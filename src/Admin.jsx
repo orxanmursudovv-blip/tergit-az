@@ -924,6 +924,163 @@ function SubscribersPanel({ token, onAuthError }) {
 }
 
 /* ============================================================
+   SEO PLANNER PANELİ
+   ============================================================ */
+
+function SeoPanel() {
+  const [sitemap, setSitemap] = useState('');
+  const [robots, setRobots] = useState('');
+  const [loadingSitemap, setLoadingSitemap] = useState(true);
+  const [loadingRobots, setLoadingRobots] = useState(true);
+  const [errorSitemap, setErrorSitemap] = useState('');
+  const [errorRobots, setErrorRobots] = useState('');
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    fetch('/sitemap.xml')
+      .then((r) => {
+        if (!r.ok) throw new Error('Sitemap yüklənə bilmədi');
+        return r.text();
+      })
+      .then((txt) => { setSitemap(txt); setLoadingSitemap(false); })
+      .catch((e) => { setErrorSitemap(e.message); setLoadingSitemap(false); });
+  }, []);
+
+  useEffect(() => {
+    fetch('/robots.txt')
+      .then((r) => {
+        if (!r.ok) throw new Error('Robots.txt yüklənə bilmədi');
+        return r.text();
+      })
+      .then((txt) => { setRobots(txt); setLoadingRobots(false); })
+      .catch((e) => { setErrorRobots(e.message); setLoadingRobots(false); });
+  }, []);
+
+  function download(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    addToast(`${filename} yükləndi.`, 'success');
+  }
+
+  function copyToClipboard(text, label) {
+    navigator.clipboard.writeText(text).then(() => {
+      addToast(`${label} kopyalandı.`, 'success');
+    }).catch(() => {
+      addToast('Kopyalama uğursuz oldu.', 'error');
+    });
+  }
+
+  return (
+    <div>
+      <div className="admin-topbar">
+        <h1>SEO Planner</h1>
+      </div>
+
+      {/* ── SİTEMAP ── */}
+      <div className="panel" style={{ marginBottom: 28 }}>
+        <div className="panel-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3>🗺️ Sitemap.xml</h3>
+          <div className="row-actions">
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => copyToClipboard(sitemap, 'Sitemap')}
+              disabled={!sitemap}
+            >
+              📋 Kopyala
+            </button>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => download(sitemap, 'sitemap.xml', 'application/xml')}
+              disabled={!sitemap}
+            >
+              ⬇ Yüklə
+            </button>
+            <a
+              href="/sitemap.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost btn-sm"
+            >
+              🔗 Aç
+            </a>
+          </div>
+        </div>
+        {loadingSitemap && <div className="empty-state">Sitemap yüklənir…</div>}
+        {errorSitemap && <div className="error-banner">{errorSitemap}</div>}
+        {!loadingSitemap && !errorSitemap && (
+          <textarea
+            readOnly
+            value={sitemap}
+            style={{
+              width: '100%', minHeight: 260, fontFamily: 'monospace',
+              fontSize: 12, padding: 14, background: 'var(--bg)',
+              color: 'var(--text)', border: '1px solid var(--border)',
+              borderRadius: 8, resize: 'vertical', lineHeight: 1.6,
+            }}
+          />
+        )}
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 10 }}>
+          Bu sitemap dinamik olaraq yaranır — yeni bloq yazısı əlavə etdikcə avtomatik yenilənir. Google Search Console-a bu linki göndərə bilərsiniz: <code style={{ color: 'var(--accent)' }}>https://tergit.az/sitemap.xml</code>
+        </p>
+      </div>
+
+      {/* ── ROBOTS.TXT ── */}
+      <div className="panel">
+        <div className="panel-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3>🤖 Robots.txt</h3>
+          <div className="row-actions">
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => copyToClipboard(robots, 'Robots.txt')}
+              disabled={!robots}
+            >
+              📋 Kopyala
+            </button>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => download(robots, 'robots.txt', 'text/plain')}
+              disabled={!robots}
+            >
+              ⬇ Yüklə
+            </button>
+            <a
+              href="/robots.txt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost btn-sm"
+            >
+              🔗 Aç
+            </a>
+          </div>
+        </div>
+        {loadingRobots && <div className="empty-state">Robots.txt yüklənir…</div>}
+        {errorRobots && <div className="error-banner">{errorRobots}</div>}
+        {!loadingRobots && !errorRobots && (
+          <textarea
+            readOnly
+            value={robots}
+            style={{
+              width: '100%', minHeight: 140, fontFamily: 'monospace',
+              fontSize: 13, padding: 14, background: 'var(--bg)',
+              color: 'var(--text)', border: '1px solid var(--border)',
+              borderRadius: 8, resize: 'vertical', lineHeight: 1.8,
+            }}
+          />
+        )}
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 10 }}>
+          Robots.txt axtarış motorlarına saytın hansı hissələrini gəzməməsini bildirir. <code style={{ color: 'var(--accent)' }}>/admin</code> və <code style={{ color: 'var(--accent)' }}>/api</code> qorunur.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    ADMIN SHELL (sidebar + panel marşrutlaması)
    ============================================================ */
 
@@ -932,7 +1089,8 @@ const TABS = [
   { id: 'posts', label: 'Bloq İdarəsi', icon: '📝' },
   { id: 'categories', label: 'Kateqoriya İdarəsi', icon: '🏷️' },
   { id: 'messages', label: 'Mesajlar', icon: '✉️' },
-  { id: 'subscribers', label: 'Abunəçilər', icon: '👥' }
+  { id: 'subscribers', label: 'Abunəçilər', icon: '👥' },
+  { id: 'seo', label: 'SEO Planner', icon: '🔍' }
 ];
 
 function AdminShell({ token, username, onLogout }) {
@@ -957,6 +1115,8 @@ function AdminShell({ token, username, onLogout }) {
         return <MessagesPanel token={token} onAuthError={handleAuthError} />;
       case 'subscribers':
         return <SubscribersPanel token={token} onAuthError={handleAuthError} />;
+      case 'seo':
+        return <SeoPanel />;
       default:
         return <DashboardPanel token={token} onAuthError={handleAuthError} />;
     }
