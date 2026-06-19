@@ -54,7 +54,8 @@ const FILES = {
   subscribers: path.join(DATA_DIR, 'subscribers.json'),
   posts: path.join(DATA_DIR, 'posts.json'),
   categories: path.join(DATA_DIR, 'categories.json'),
-  blockedIps: path.join(DATA_DIR, 'blocked-ips.json')
+  blockedIps: path.join(DATA_DIR, 'blocked-ips.json'),
+  robotsTxt: path.join(DATA_DIR, 'robots.txt')
 };
 
 const SEED_CATEGORIES = [
@@ -109,12 +110,20 @@ function emptyArrayFile() {
 async function ensureDataFiles() {
   await fsp.mkdir(DATA_DIR, { recursive: true });
 
+  const DEFAULT_ROBOTS = `User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+Sitemap: ${SITE_URL}/sitemap.xml`;
+
   const defaults = {
     [FILES.messages]: emptyArrayFile(),
     [FILES.subscribers]: emptyArrayFile(),
     [FILES.posts]: JSON.stringify(SEED_POSTS, null, 2),
     [FILES.categories]: JSON.stringify(SEED_CATEGORIES, null, 2),
-    [FILES.blockedIps]: '{}'
+    [FILES.blockedIps]: '{}',
+    [FILES.robotsTxt]: DEFAULT_ROBOTS
   };
 
   for (const [filePath, defaultContent] of Object.entries(defaults)) {
@@ -843,15 +852,46 @@ ${postEntries}
   }
 });
 
-app.get('/robots.txt', (req, res) => {
-  const content = `User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /api
+app.get('/robots.txt', async (req, res) => {
+  try {
+    const content = await fsp.readFile(FILES.robotsTxt, 'utf-8');
+    res.header('Content-Type', 'text/plain');
+    return res.send(content);
+  } catch {
+    const fallback = `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\n\nSitemap: ${SITE_URL}/sitemap.xml`;
+    res.header('Content-Type', 'text/plain');
+    return res.send(fallback);
+  }
+});
 
-Sitemap: ${SITE_URL}/sitemap.xml`;
-  res.header('Content-Type', 'text/plain');
-  return res.send(content);
+/* ============================================================
+   ROUTES — SEO: ROBOTS.TXT ADMIN API
+   ============================================================ */
+
+app.get('/api/seo/robots', authenticateToken, async (req, res) => {
+  try {
+    const content = await fsp.readFile(FILES.robotsTxt, 'utf-8');
+    return success(res, { content }, 'robots.txt oxundu.');
+  } catch {
+    return failure(res, 'NOT_FOUND', 404, 'robots.txt faylı tapılmadı.');
+  }
+});
+
+app.put('/api/seo/robots', authenticateToken, async (req, res) => {
+  try {
+    const content = req.body?.content;
+    if (typeof content !== 'string') {
+      return failure(res, 'MISSING_CONTENT', 400, 'Məzmun tələb olunur.');
+    }
+    if (content.length > 50000) {
+      return failure(res, 'TOO_LARGE', 400, 'robots.txt faylı 50KB-dan böyük ola bilməz.');
+    }
+    await fsp.writeFile(FILES.robotsTxt, content, 'utf-8');
+    return success(res, { content }, 'robots.txt saxlanıldı.');
+  } catch (err) {
+    console.error(err);
+    return failure(res, 'SERVER_ERROR', 500, 'Server xətası baş verdi.');
+  }
 });
 
 /* ============================================================
