@@ -410,11 +410,6 @@ function Footer() {
               <Link to="/bloq">Bloq</Link>
               <Link to="/elaqe">Əlaqə</Link>
             </div>
-            <div className="footer-col">
-              <h4>Digər</h4>
-              <Link to="/admin">Admin Panel</Link>
-              <a href="/sitemap.xml">Sitemap</a>
-            </div>
           </div>
         </div>
 
@@ -431,34 +426,138 @@ function Footer() {
    HOME PAGE
    ============================================================ */
 
+const RECOVERY_STEPS = [
+  { icon: '🪞', emoji: 'g', title: 'Qəbul', desc: 'Problemin varlığını tanımaq ən cəsarətli addımdır' },
+  { icon: '🔍', emoji: 'b', title: 'Qiymətləndirmə', desc: 'Asılılığın dərəcəsini mütəxəssislə müəyyən et' },
+  { icon: '💊', emoji: 'a', title: 'Detoks', desc: 'Tibbi nəzarətdə cismani asılılıqdan azad olmaq' },
+  { icon: '🧠', emoji: 'p', title: 'Terapiya', desc: 'Psixoloji köklərə ünvanlanan intensiv müalicə' },
+  { icon: '🌱', emoji: 'c', title: 'Yeni həyat', desc: 'Davamlı sağalma üçün yeni vərdişlər' },
+];
+
+const SIGNS = [
+  { title: 'Nəzarəti itirmək', desc: 'İstəsən də dayana bilmirsən, dəfələrlə cəhd edirsən amma bacarmırsan' },
+  { title: 'Dözümlülük artması', desc: 'Eyni təsiri almaq üçün getdikcə daha çox istifadə etməlisən' },
+  { title: 'Kəsilmə sindromu', desc: 'İstifadəni dayandıranda fiziki və ya psixi narahatçılıq hiss edirsən' },
+  { title: 'Sosial geri çəkilmə', desc: 'Əvvəllər sevdiyin işlərdən, insanlardan uzaqlaşırsan' },
+  { title: 'Problemlərə baxmayaraq davam', desc: 'Sağlamlığına, ailəyə, işə zərər verdiyi baxmayaraq davam edirsən' },
+  { title: 'Gizlətmə və yalan', desc: 'Yaxınlarından gizlədir, istifadə barədə yalan danışırsan' },
+];
+
+const ADDICTION_TYPES_EXT = [
+  { icon: '🎰', bg: '#EEF2FF', title: 'Qumar asılılığı', desc: 'Kumar, beyin ödül sistemini maddə kimi stimullaşdırır. Maliyyə böhranına, ailə problemlərinə səbəb olur.', tags: [{ label: 'Davranış asılılığı', cls: 'tag-blue' }, { label: 'Maliyyə riski', cls: 'tag-amber' }] },
+  { icon: '📱', bg: '#F5F3FF', title: 'Texnologiya / İnternet', desc: 'Sosial media, oyun, internet asılılığı xüsusilə gənclər arasında sürətlə artır. Real həyatdan uzaqlaşma ciddi nəticələr verir.', tags: [{ label: 'Müasir asılılıq', cls: 'tag-purple' }, { label: 'Proqramlar mövcud', cls: 'tag-green' }] },
+  { icon: '🍔', bg: '#FFF1F2', title: 'Yemək / Qida asılılığı', desc: 'Şəkər, yağlı qidalar beyin dopamin sistemini aktivləşdirir. Kompulsiv yemək davranışı cismani və psixoloji problemlər yaradır.', tags: [{ label: 'Davranış', cls: 'tag-coral' }, { label: 'Terapiya effektivdir', cls: 'tag-blue' }] },
+  { icon: '💪', bg: '#ECFDF5', title: 'İdman / Egzersiz asılılığı', desc: 'Həddindən artıq məşq endorfin asılılığına çevrilə bilər. Travma, zədə və sosial izolyasiyaya yol aça bilər.', tags: [{ label: 'Az tanınan', cls: 'tag-green' }, { label: 'Diqqət tələb edir', cls: 'tag-amber' }] },
+  { icon: '🛍️', bg: '#FEF9C3', title: 'Alış-veriş asılılığı', desc: 'Kompulsiv alış-veriş emosional boşluğu doldurmaq cəhdidir. Ciddi maliyyə böhranına gətirib çıxarır.', tags: [{ label: 'Maliyyə', cls: 'tag-amber' }, { label: 'Psixoloji köklər', cls: 'tag-purple' }] },
+  { icon: '❤️', bg: '#F0F9FF', title: 'Münasibət / Sevgi asılılığı', desc: 'Kodependensiya real münasibətdir. İnsanlar başqaları vasitəsilə öz dəyərlərini axtarırlar, bu isə tükenmişliyə yol açır.', tags: [{ label: 'Emosional', cls: 'tag-coral' }, { label: 'Terapiya vacibdir', cls: 'tag-blue' }] },
+];
+
+function QuizWidget() {
+  const [selected, setSelected] = useState([]);
+  const [result, setResult] = useState('');
+  const opts = [
+    'Dayanmağa cəhd etdim, amma bacarmadım',
+    'Ailə və ya dostlar narahatçılıqlarını bildirdi',
+    'İşimə, oxumağıma mane oldu',
+    'Güclü istək hiss etdim, düşüncəm buraya bağlandı',
+    'Bunları gizlətdim, özümü utandım',
+  ];
+
+  function toggle(i) {
+    setSelected((prev) => prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]);
+    setResult('');
+  }
+
+  function showResult() {
+    const n = selected.length;
+    if (n === 0) setResult('Heç bir əlamət seçmədiniz. Mövcud vəziyyətini izləməyə davam et.');
+    else if (n <= 2) setResult('Bəzi risk əlamətləri var. Bir mütəxəssislə söhbət etmək faydalı ola bilər.');
+    else setResult('Mütəxəssisə müraciət etmək tövsiyə olunur. Kömək almaq güc əlamətidir.');
+  }
+
+  return (
+    <div className="home-quiz">
+      <h3>Sürətli özqiymət testi</h3>
+      <p>Son 30 gün içində bunlardan hansıları yaşadın?</p>
+      <div className="home-quiz__opts">
+        {opts.map((o, i) => (
+          <div
+            key={i}
+            className={`home-quiz__opt${selected.includes(i) ? ' active' : ''}`}
+            onClick={() => toggle(i)}
+          >
+            <span className="home-quiz__check" />
+            <span>{o}</span>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={showResult}>
+        Nəticəni gör
+      </button>
+      {result && <div className="home-quiz__result">{result}</div>}
+    </div>
+  );
+}
+
+function DayTracker() {
+  const [type, setType] = useState('sosial-media');
+  const [date, setDate] = useState('');
+  const [days, setDays] = useState(null);
+
+  function calc() {
+    if (!date) return;
+    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
+    setDays(diff >= 0 ? diff : 0);
+  }
+
+  let msg = '';
+  if (days !== null) {
+    if (days === 0) msg = 'Bu gün başladın — hər böyük yol bir addımla başlayır! 🌱';
+    else if (days < 7) msg = `${days} gün! Çox gözəl başlanğıc. Davam et! 💪`;
+    else if (days < 30) msg = `${days} gün! İlk həftəni keçdin. Möhtəşəmsən! 🔥`;
+    else if (days < 100) msg = `${days} gün azad! Bu cəsarətin sənə həyatını qaytarır. ⭐`;
+    else msg = `${days} gün azad! Sən artıq başqasına ilham mənbəyisən. 🏆`;
+  }
+
+  return (
+    <div className="home-tracker">
+      <div className="home-tracker__header">
+        <h3>Azadlıq saydacı</h3>
+        <p>Asılılığı nə vaxt tərk etdin?</p>
+      </div>
+      <div className="home-tracker__form">
+        <select value={type} onChange={(e) => setType(e.target.value)} className="home-tracker__select">
+          <option value="sosial-media">📱 Sosial Media</option>
+          <option value="oyun">🎮 Oyun</option>
+          <option value="siqaret">🚬 Siqaret</option>
+          <option value="kofein">☕ Kofein</option>
+          <option value="fast-food">🍔 Fast Food</option>
+          <option value="alkoqol">🍺 Alkoqol</option>
+          <option value="narkotik">💊 Narkotik</option>
+        </select>
+        <div className="home-tracker__date-row">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => { setDate(e.target.value); setDays(null); }}
+            className="home-tracker__input"
+            max={new Date().toISOString().split('T')[0]}
+          />
+          <button className="btn btn-primary btn-sm" onClick={calc}>Hesabla</button>
+        </div>
+        {days !== null && (
+          <div className="home-tracker__result">
+            <div className="home-tracker__big">{days}</div>
+            <div className="home-tracker__sub">gün azad</div>
+            <div className="home-tracker__msg">{msg}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function HomePage() {
-  const [liveStats, setLiveStats] = useState(null);
-  const [categoriesCount, setCategoriesCount] = useState(null);
-  const [postsCount, setPostsCount] = useState(null);
-
-  useEffect(() => {
-    let active = true;
-    async function loadStats() {
-      try {
-        const [healthRes, catRes, postsRes] = await Promise.all([
-          fetch('/api/health').then((r) => r.json()),
-          fetch('/api/categories').then((r) => r.json()),
-          fetch('/api/posts').then((r) => r.json())
-        ]);
-        if (!active) return;
-        if (healthRes.success) setLiveStats(healthRes.data);
-        if (catRes.success) setCategoriesCount(catRes.data.length);
-        if (postsRes.success) setPostsCount(postsRes.data.length);
-      } catch {
-        /* səssiz uğursuzluq — UI fallback dəyərləri göstərir */
-      }
-    }
-    loadStats();
-    return () => {
-      active = false;
-    };
-  }, []);
-
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -469,7 +568,7 @@ function HomePage() {
   };
 
   return (
-    <div className="page-enter">
+    <div className="page-enter home-page">
       <SEO
         title="Asılılıqdan azad olmağın yolu"
         description="Tergit.az — sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılığından azad olmaq üçün praktiki məsləhətlər və bloq."
@@ -478,59 +577,186 @@ function HomePage() {
         jsonLd={orgJsonLd}
       />
 
-      <section className="hero">
-        <div className="container">
-          <span className="hero__eyebrow">⛓ Zənciri qır</span>
-          <h1 className="hero__title">
-            Asılılıqdan <em>azad olmağın</em> yolunu birlikdə tapaq
-          </h1>
-          <p className="hero__subtitle">
-            Tergit.az sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılığı ilə mübarizədə
-            sənə praktiki məsləhətlər, real bilgi və dəstək təklif edir.
-          </p>
-          <div className="hero__actions">
-            <Link to="/asililiqlar" className="btn btn-primary">7 asılılığı kəşf et</Link>
-            <Link to="/bloq" className="btn btn-ghost">Bloqu oxu</Link>
-          </div>
-          <div className="hero__meta">
-            <StatusBadge />
+      {/* ── HERO ── */}
+      <section className="home-hero">
+        <div className="container home-hero__grid">
+          <div className="home-hero__left">
+            <div className="home-hero__badge">
+              <span className="home-hero__dot" />
+              Azərbaycanda ilk asılılıq məlumat platforması
+            </div>
+            <h1 className="home-hero__title">
+              Asılılıqdan <em>azad olmağın</em> yolunu birlikdə tapaq
+            </h1>
+            <p className="home-hero__sub">
+              Tergit.az sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılığı ilə
+              mübarizədə sənə praktiki məsləhətlər, real bilgi və dəstək təklif edir.
+            </p>
+            <div className="home-hero__btns">
+              <Link to="/asililiqlar" className="btn btn-primary">7 asılılığı kəşf et →</Link>
+              <Link to="/bloq" className="btn btn-ghost">Bloqu oxu</Link>
+            </div>
+            <div className="home-hero__stats">
+              <div className="home-hero__stat">
+                <span className="home-hero__stat-num">7</span>
+                <span className="home-hero__stat-lbl">Asılılıq növü</span>
+              </div>
+              <div className="home-hero__stat">
+                <span className="home-hero__stat-num">100%</span>
+                <span className="home-hero__stat-lbl">Pulsuz məlumat</span>
+              </div>
+              <div className="home-hero__stat">
+                <span className="home-hero__stat-num">24/7</span>
+                <span className="home-hero__stat-lbl">Onlayn dəstək</span>
+              </div>
+            </div>
           </div>
 
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-card__value">7</div>
-              <div className="stat-card__label">Əhatə olunan asılılıq növü</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-card__value">{postsCount ?? '—'}</div>
-              <div className="stat-card__label">Bloq məqaləsi</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-card__value">{categoriesCount ?? '—'}</div>
-              <div className="stat-card__label">Kateqoriya</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-card__value">{liveStats?.liveVisits ?? '—'}</div>
-              <div className="stat-card__label">Canlı baxış sayı</div>
+          <div className="home-hero__right">
+            <div className="home-hero__card">
+              <h3 className="home-hero__card-title">Sağalma yolunun mərhələləri</h3>
+              <ul className="home-recovery-steps">
+                {RECOVERY_STEPS.map((s, i) => (
+                  <li key={i} className="home-recovery-step">
+                    <span className={`home-step-icon home-step-icon--${s.emoji}`}>{s.icon}</span>
+                    <div>
+                      <div className="home-step-title">{s.title}</div>
+                      <div className="home-step-desc">{s.desc}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section">
+      {/* ── ASİLİLIQ NÖVLƏRİ ── */}
+      <section className="home-section home-section--gray">
         <div className="container">
-          <div className="section-head">
-            <span className="section-head__eyebrow">7 Asılılıq</span>
-            <h2>Hansı asılılıqla mübarizə aparırsan?</h2>
-            <p>Hər kateqoriya üçün konkret, tətbiq edilə bilən məsləhətlər hazırladıq.</p>
-          </div>
-          <div className="addiction-grid">
+          <div className="home-section__label">Asılılıq növləri</div>
+          <h2 className="home-section__title">Hansı asılılıqla mübarizə aparırsan?</h2>
+          <p className="home-section__sub">Hər kateqoriya üçün konkret, tətbiq edilə bilən məsləhətlər hazırladıq.</p>
+          <div className="home-types-grid">
             {ADDICTIONS.map((a) => (
               <AddictionCard key={a.id} addiction={a} />
             ))}
           </div>
+          <div className="home-types-grid" style={{ marginTop: 24 }}>
+            {ADDICTION_TYPES_EXT.map((t, i) => (
+              <div key={i} className="home-type-card">
+                <div className="home-type-icon" style={{ background: t.bg }}>{t.icon}</div>
+                <h3>{t.title}</h3>
+                <p>{t.desc}</p>
+                <div className="home-type-tags">
+                  {t.tags.map((tg, j) => (
+                    <span key={j} className={`home-tag ${tg.cls}`}>{tg.label}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
             <Link to="/asililiqlar" className="btn btn-ghost">Bütün asılılıqları gör</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ƏLAMƏTLƏr + TEST ── */}
+      <section className="home-section">
+        <div className="container">
+          <div className="home-section__label">Əlamətlər və test</div>
+          <h2 className="home-section__title">Asılılığın əlamətlərini tanı</h2>
+          <p className="home-section__sub">Erkən tanıma — erkən müalicə. Bu əlamətlərdən biri sənə tanış gəlirsə, kömək almağı düşün.</p>
+          <div className="home-signs-layout">
+            <div className="home-signs-list">
+              {SIGNS.map((s, i) => (
+                <div key={i} className="home-sign-item">
+                  <div className="home-sign-num">{i + 1}</div>
+                  <div>
+                    <div className="home-sign-title">{s.title}</div>
+                    <div className="home-sign-desc">{s.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <QuizWidget />
+          </div>
+        </div>
+      </section>
+
+      {/* ── SAĞALMA YOLU ── */}
+      <section className="home-section home-section--gray">
+        <div className="container">
+          <div className="home-section__label">Sağalma yolu</div>
+          <h2 className="home-section__title">Sağalma yolunun 5 mərhələsi</h2>
+          <p className="home-section__sub">Sağalma bir gecədə olmur — bu bir yol, bir proses, hər addımda özünü kəşf etməkdir.</p>
+          <div className="home-path-steps">
+            {RECOVERY_STEPS.map((s, i) => (
+              <div key={i} className="home-path-step">
+                <div className="home-path-circle">{s.icon}</div>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── AZADLIQ SAYDACI ── */}
+      <section className="home-section home-section--dark">
+        <div className="container">
+          <div className="home-section__label home-section__label--light">Azadlıq saydacı</div>
+          <h2 className="home-section__title home-section__title--light">Azad günlərini say</h2>
+          <p className="home-section__sub home-section__sub--light">Asılılığı tərk etdiyin günü daxil et, neçə gündür azad olduğunu gör.</p>
+          <div className="home-tracker-layout">
+            <DayTracker />
+            <div className="home-milestones">
+              {[
+                { icon: '🌱', title: '1 həftə', desc: 'Fiziki simptomlar azalmağa başlayır', days: '7 gün' },
+                { icon: '⭐', title: '1 ay', desc: 'Beyin kimyası normallaşmağa başlayır', days: '30 gün' },
+                { icon: '🔥', title: '3 ay', desc: 'Yeni vərdişlər möhkəmlənir', days: '90 gün' },
+                { icon: '🏆', title: '1 il', desc: 'Tam yeni bir həyat tərzi', days: '365 gün' },
+              ].map((m, i) => (
+                <div key={i} className="home-milestone">
+                  <span className="home-milestone__icon">{m.icon}</span>
+                  <div className="home-milestone__info">
+                    <div className="home-milestone__title">{m.title}</div>
+                    <div className="home-milestone__desc">{m.desc}</div>
+                  </div>
+                  <span className="home-milestone__badge">{m.days}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── KƏMƏk XƏTTI ── */}
+      <section className="home-section home-section--darkblue">
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div className="home-section__label home-section__label--light">Kömək xətti</div>
+          <h2 className="home-section__title home-section__title--light">Kömək almaq güc əlamətidir</h2>
+          <p className="home-section__sub home-section__sub--light" style={{ margin: '0 auto 48px' }}>
+            Əgər özün üçün yardıma ehtiyacın varsa, lütfən müraciət et. Bir addım ataraq hər şeyi dəyişdirə bilərsən.
+          </p>
+          <div className="home-hotline-cards">
+            {[
+              { icon: '📞', title: 'Xüsusi yardım xətti', desc: 'Azərbaycan Respublikasında narkologiya yardım xətti', num: '152', avail: '24/7 pulsuz' },
+              { icon: '🏥', title: 'Narkologiya Mərkəzi', desc: 'Bakı Narkologiya Mərkəzinə müraciət et', num: '012 595 30 05', avail: 'İş günləri' },
+              { icon: '💬', title: 'Psixoloji dəstək', desc: 'Psixoloji Sağlamlıq Mərkəzi ilə əlaqə', num: '012 492 92 10', avail: 'Həftəiçi' },
+            ].map((h, i) => (
+              <div key={i} className="home-hotline-card">
+                <div className="home-hotline-icon">{h.icon}</div>
+                <h4>{h.title}</h4>
+                <p>{h.desc}</p>
+                <div className="home-hotline-num">{h.num}</div>
+                <div className="home-hotline-avail">{h.avail}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 40 }}>
+            <Link to="/elaqe" className="btn btn-primary">Bizə yazın →</Link>
           </div>
         </div>
       </section>
