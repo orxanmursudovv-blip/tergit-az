@@ -314,7 +314,7 @@ function Header() {
     <header className="site-header">
       <div className="container site-header__inner">
         <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
-          <ChainLogo />
+          <img src="/logo.png" alt="Tergit.az logo" className="brand-logo" />
           Tergit<span style={{ color: 'var(--accent)' }}>.az</span>
         </Link>
 
@@ -383,7 +383,7 @@ function Footer() {
         <div className="footer-grid">
           <div style={{ maxWidth: 320 }}>
             <div className="brand" style={{ marginBottom: 14 }}>
-              <ChainLogo size={30} />
+              <img src="/logo.png" alt="Tergit.az logo" className="brand-logo" style={{ width: 30, height: 30 }} />
               Tergit<span style={{ color: 'var(--accent)' }}>.az</span>
             </div>
             <p>Asılılıqlardan azad olmaq üçün məlumat, məsləhət və dəstək platforması.</p>
