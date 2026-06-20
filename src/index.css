@@ -1139,6 +1139,77 @@ tr:last-child td {
   .nav-links { display: none; }
   .nav-toggle { display: flex; }
   .footer-cols { gap: 30px; }
+
+  /* Container */
+  .container { padding: 0 16px; }
+
+  /* Hero section */
+  .home-hero {
+    min-height: auto;
+    padding: 90px 16px 50px;
+  }
+  .home-hero__grid { grid-template-columns: 1fr; gap: 30px; }
+  .home-hero__right { display: none; }
+  .home-hero__title { font-size: clamp(24px, 7vw, 34px); }
+  .home-hero__sub { font-size: 15px; }
+  .home-hero__btns { flex-direction: column; }
+  .home-hero__btns .btn { width: 100%; text-align: center; }
+  .home-hero__stats { gap: 8px; }
+  .home-hero__stat-num { font-size: 22px; }
+  .home-hero__stat-lbl { font-size: 10px; }
+
+  /* Sections */
+  .home-section { padding: 48px 16px; }
+  .home-section__title { font-size: clamp(20px, 6vw, 28px); }
+  .home-section__sub { font-size: 14px; }
+
+  /* Type cards */
+  .home-types-grid { grid-template-columns: 1fr; }
+  .home-type-card { padding: 20px; }
+
+  /* Signs */
+  .home-signs-layout { grid-template-columns: 1fr; gap: 28px; }
+
+  /* Quiz */
+  .home-quiz { padding: 20px 16px; }
+  .home-quiz h3 { font-size: 18px; }
+
+  /* Path steps */
+  .home-path-steps { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .home-path-steps::before { display: none; }
+  .home-path-circle { width: 60px; height: 60px; font-size: 22px; }
+  .home-path-step h3 { font-size: 13px; }
+  .home-path-step p { font-size: 11px; }
+
+  /* Tracker */
+  .home-tracker-layout { grid-template-columns: 1fr; gap: 24px; }
+  .home-tracker { padding: 20px 16px; }
+  .home-tracker__date-row { flex-direction: column; }
+  .home-tracker__big { font-size: 36px; }
+
+  /* Hotline */
+  .home-hotline-cards { grid-template-columns: 1fr; }
+  .home-hotline-card { padding: 24px 16px; }
+
+  /* Addiction grid */
+  .addiction-grid { grid-template-columns: 1fr; }
+  .addiction-card { padding: 20px; }
+
+  /* Blog grid */
+  .blog-grid { grid-template-columns: 1fr; }
+
+  /* Footer */
+  .footer-cols { flex-direction: column; gap: 24px; }
+  .newsletter-form { flex-direction: column; }
+  .newsletter-form input { border-radius: 8px; }
+  .newsletter-form .btn { border-radius: 8px; width: 100%; }
+
+  /* Post detail */
+  .post-detail__title { font-size: 22px; }
+  .post-detail__cover { height: 200px; }
+
+  /* Buttons */
+  .btn { padding: 11px 18px; font-size: 14px; }
 }
 
 @media (max-width: 480px) {
@@ -1146,6 +1217,10 @@ tr:last-child td {
   .hero { padding: 64px 0 44px; }
   .admin-main { padding: 24px 18px; }
   th, td { padding: 12px 14px; }
+  .home-path-steps { grid-template-columns: 1fr; }
+  .home-hotline-card { padding: 20px 14px; }
+  .home-section__title { font-size: 20px; }
+  .home-quiz { padding: 16px 14px; }
 }
 
 /* ============================================================
