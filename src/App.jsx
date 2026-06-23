@@ -448,12 +448,90 @@ const SIGNS = [
 ];
 
 const ADDICTION_TYPES_EXT = [
-  { icon: '🎰', bg: '#EEF2FF', title: 'Qumar asılılığı', desc: 'Kumar, beyin ödül sistemini maddə kimi stimullaşdırır. Maliyyə böhranına, ailə problemlərinə səbəb olur.', tags: [{ label: 'Davranış asılılığı', cls: 'tag-blue' }, { label: 'Maliyyə riski', cls: 'tag-amber' }] },
-  { icon: '📱', bg: '#F5F3FF', title: 'Texnologiya / İnternet', desc: 'Sosial media, oyun, internet asılılığı xüsusilə gənclər arasında sürətlə artır. Real həyatdan uzaqlaşma ciddi nəticələr verir.', tags: [{ label: 'Müasir asılılıq', cls: 'tag-purple' }, { label: 'Proqramlar mövcud', cls: 'tag-green' }] },
-  { icon: '🍔', bg: '#FFF1F2', title: 'Yemək / Qida asılılığı', desc: 'Şəkər, yağlı qidalar beyin dopamin sistemini aktivləşdirir. Kompulsiv yemək davranışı cismani və psixoloji problemlər yaradır.', tags: [{ label: 'Davranış', cls: 'tag-coral' }, { label: 'Terapiya effektivdir', cls: 'tag-blue' }] },
-  { icon: '💪', bg: '#ECFDF5', title: 'İdman / Egzersiz asılılığı', desc: 'Həddindən artıq məşq endorfin asılılığına çevrilə bilər. Travma, zədə və sosial izolyasiyaya yol aça bilər.', tags: [{ label: 'Az tanınan', cls: 'tag-green' }, { label: 'Diqqət tələb edir', cls: 'tag-amber' }] },
-  { icon: '🛍️', bg: '#FEF9C3', title: 'Alış-veriş asılılığı', desc: 'Kompulsiv alış-veriş emosional boşluğu doldurmaq cəhdidir. Ciddi maliyyə böhranına gətirib çıxarır.', tags: [{ label: 'Maliyyə', cls: 'tag-amber' }, { label: 'Psixoloji köklər', cls: 'tag-purple' }] },
-  { icon: '❤️', bg: '#F0F9FF', title: 'Münasibət / Sevgi asılılığı', desc: 'Kodependensiya real münasibətdir. İnsanlar başqaları vasitəsilə öz dəyərlərini axtarırlar, bu isə tükenmişliyə yol açır.', tags: [{ label: 'Emosional', cls: 'tag-coral' }, { label: 'Terapiya vacibdir', cls: 'tag-blue' }] },
+  {
+    id: 'qumar',
+    name: 'Qumar',
+    icon: '🎰',
+    level: 'yuksek',
+    description: 'Kumar, beyin ödül sistemini maddə kimi stimullaşdırır. Maliyyə böhranına, ailə problemlərinə səbəb olur.',
+    tips: [
+      'Kumar saytlarını və tətbiqlərini telefonundan silin',
+      'Maliyyə hesablarınıza giriş imkanını məhdudlaşdırın',
+      'Oyun salonlarından uzaq marşrutlar seçin',
+      'Mütəxəssis dəstəyi və qumarbazlar anonim qrupuna müraciət edin',
+      'Boş vaxtı idman və ya hobbi ilə doldurun'
+    ]
+  },
+  {
+    id: 'internet',
+    name: 'Texnologiya / İnternet',
+    icon: '💻',
+    level: 'orta',
+    description: 'Sosial media, oyun, internet asılılığı xüsusilə gənclər arasında sürətlə artır. Real həyatdan uzaqlaşma ciddi nəticələr verir.',
+    tips: [
+      'Gündəlik ekran vaxtı limitini tətbiq parametrlərindən təyin edin',
+      'Gecə 22:00-dan sonra cihazları başqa otaqda saxlayın',
+      'İnternetdən azad günlər — tam "offline" günlər planlayın',
+      'Real həyatda ictimai fəaliyyətlərə qatılın',
+      'Rəqəmsal detoks proqramlarından istifadə edin'
+    ]
+  },
+  {
+    id: 'yemek',
+    name: 'Yemək / Qida asılılığı',
+    icon: '🍔',
+    level: 'orta',
+    description: 'Şəkər, yağlı qidalar beyin dopamin sistemini aktivləşdirir. Kompulsiv yemək davranışı cismani və psixoloji problemlər yaradır.',
+    tips: [
+      'Emosional yemə vərdişini gündəlik qeydlə izləyin',
+      'Evdə sağlam qida seçimlərini hazır saxlayın',
+      'Yemək vaxtı ekranı söndürün, diqqətli yeyin',
+      'Dietoloq və ya psixoloqla məsləhətləşin',
+      'Stress anlarında yemək əvəzinə hərəkət edin'
+    ]
+  },
+  {
+    id: 'idman',
+    name: 'İdman / Egzersiz asılılığı',
+    icon: '💪',
+    level: 'asagi',
+    description: 'Həddindən artıq məşq endorfin asılılığına çevrilə bilər. Travma, zədə və sosial izolyasiyaya yol aça bilər.',
+    tips: [
+      'Həftəlik məşq cədvəlinə istirahət günləri əlavə edin',
+      'Bədəninizin verdiyı yorğunluq siqnallarına qulaq asın',
+      'İdman məqsədlərini sağlamlıq üzərindən qurun, obsessiya üzərindən yox',
+      'Sosial idman fəaliyyətlərini seçin',
+      'Məşq gündəliyini mütəxəssislə birlikdə izləyin'
+    ]
+  },
+  {
+    id: 'alisveris',
+    name: 'Alış-veriş asılılığı',
+    icon: '🛍️',
+    level: 'orta',
+    description: 'Kompulsiv alış-veriş emosional boşluğu doldurmaq cəhdidir. Ciddi maliyyə böhranına gətirib çıxarır.',
+    tips: [
+      'Alış-veriş öncəsi 24 saat gözləmə qaydası tətbiq edin',
+      'Kredit kartını evdə buraxın, nağd pul limitləyin',
+      'Alış-veriş tətbiqlərini silin, bildirişləri söndürün',
+      'Maliyyə vəziyyətinizi aylıq izləyin',
+      'Emosional alış-verişin arxasındakı hissi müəyyən edin'
+    ]
+  },
+  {
+    id: 'munasibetler',
+    name: 'Münasibət / Sevgi asılılığı',
+    icon: '❤️',
+    level: 'orta',
+    description: 'Kodependensiya real münasibətdir. İnsanlar başqaları vasitəsilə öz dəyərlərini axtarırlar, bu isə tükenmişliyə yol açır.',
+    tips: [
+      'Özünüzə aid fəaliyyət və maraqlar inkişaf etdirin',
+      'Münasibətdə şəxsi sərhədlərinizi müəyyən edin',
+      'Terapevtlə kodependensiya üzərinə işləyin',
+      'Özünü sevmə praktikalarını gündəlik həyata keçirin',
+      'Dəstək qruplarına qatılın'
+    ]
+  },
 ];
 
 function QuizWidget() {
@@ -602,16 +680,16 @@ function HomePage() {
             </div>
             <div className="home-hero__stats">
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">7</span>
-                <span className="home-hero__stat-lbl">Asılılıq növü</span>
+                <span className="home-hero__stat-num">500+</span>
+                <span className="home-hero__stat-lbl">Praktiki məsləhət</span>
               </div>
               <div className="home-hero__stat">
                 <span className="home-hero__stat-num">100%</span>
                 <span className="home-hero__stat-lbl">Pulsuz məlumat</span>
               </div>
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">24/7</span>
-                <span className="home-hero__stat-lbl">Onlayn dəstək</span>
+                <span className="home-hero__stat-num">Az #1</span>
+                <span className="home-hero__stat-lbl">Asılılıq platforması</span>
               </div>
             </div>
           </div>
@@ -647,17 +725,8 @@ function HomePage() {
             ))}
           </div>
           <div className="home-types-grid" style={{ marginTop: 24 }}>
-            {ADDICTION_TYPES_EXT.map((t, i) => (
-              <div key={i} className="home-type-card">
-                <div className="home-type-icon" style={{ background: t.bg }}>{t.icon}</div>
-                <h3>{t.title}</h3>
-                <p>{t.desc}</p>
-                <div className="home-type-tags">
-                  {t.tags.map((tg, j) => (
-                    <span key={j} className={`home-tag ${tg.cls}`}>{tg.label}</span>
-                  ))}
-                </div>
-              </div>
+            {ADDICTION_TYPES_EXT.map((a) => (
+              <AddictionCard key={a.id} addiction={a} />
             ))}
           </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
@@ -732,28 +801,27 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ── KƏMƏk XƏTTI ── */}
+      {/* ── SOSİAL MEDİA ── */}
       <section className="home-section home-section--darkblue">
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="home-section__label home-section__label--light">Kömək xətti</div>
-          <h2 className="home-section__title home-section__title--light">Kömək almaq güc əlamətidir</h2>
+          <div className="home-section__label home-section__label--light">Sosial media</div>
+          <h2 className="home-section__title home-section__title--light">Bizi izləyin</h2>
           <p className="home-section__sub home-section__sub--light" style={{ margin: '0 auto 48px' }}>
-            Əgər özün üçün yardıma ehtiyacın varsa, lütfən müraciət et. Bir addım ataraq hər şeyi dəyişdirə bilərsən.
+            Tergit.az-ı sosial mediada izləyin, yeni məqalələr və məsləhətlərdən ilk siz xəbərdar olun.
           </p>
           <div className="home-hotline-cards">
-            {[
-              { icon: '📞', title: 'Xüsusi yardım xətti', desc: 'Azərbaycan Respublikasında narkologiya yardım xətti', num: '152', avail: '24/7 pulsuz' },
-              { icon: '🏥', title: 'Narkologiya Mərkəzi', desc: 'Bakı Narkologiya Mərkəzinə müraciət et', num: '012 595 30 05', avail: 'İş günləri' },
-              { icon: '💬', title: 'Psixoloji dəstək', desc: 'Psixoloji Sağlamlıq Mərkəzi ilə əlaqə', num: '012 492 92 10', avail: 'Həftəiçi' },
-            ].map((h, i) => (
-              <div key={i} className="home-hotline-card">
-                <div className="home-hotline-icon">{h.icon}</div>
-                <h4>{h.title}</h4>
-                <p>{h.desc}</p>
-                <div className="home-hotline-num">{h.num}</div>
-                <div className="home-hotline-avail">{h.avail}</div>
-              </div>
-            ))}
+            <a href="https://www.instagram.com/tergit.az" target="_blank" rel="noopener noreferrer" className="home-hotline-card" style={{ textDecoration: 'none' }}>
+              <div className="home-hotline-icon">📸</div>
+              <h4>Instagram</h4>
+              <p>Faydalı məsləhətlər, motivasiya yazıları və yeniliklər üçün bizi izləyin.</p>
+              <div className="home-hotline-num" style={{ fontSize: 16 }}>@tergit.az</div>
+            </a>
+            <a href="https://www.tiktok.com/@tergit.az" target="_blank" rel="noopener noreferrer" className="home-hotline-card" style={{ textDecoration: 'none' }}>
+              <div className="home-hotline-icon">🎵</div>
+              <h4>TikTok</h4>
+              <p>Qısa və maraqlı videolarla asılılıq haqqında bilgilər əldə edin.</p>
+              <div className="home-hotline-num" style={{ fontSize: 16 }}>@tergit.az</div>
+            </a>
           </div>
           <div style={{ marginTop: 40 }}>
             <Link to="/elaqe" className="btn btn-primary">Bizə yazın →</Link>
