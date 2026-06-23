@@ -274,16 +274,20 @@ const LEVEL_LABELS = { yuksek: 'Yüksək', orta: 'Orta', asagi: 'Aşağı' };
 
 function AddictionCard({ addiction }) {
   const [open, setOpen] = useState(false);
+  const levelColors = { yuksek: '#F85149', orta: '#FFB703', asagi: '#3FB950' };
+  const levelBg = { yuksek: 'rgba(248,81,73,0.08)', orta: 'rgba(255,183,3,0.08)', asagi: 'rgba(63,185,80,0.08)' };
   return (
-    <div className="addiction-card">
+    <div className="addiction-card" style={{ borderTop: `3px solid ${levelColors[addiction.level]}` }}>
       <div className="addiction-card__top">
         <div className="addiction-card__icon" aria-hidden="true">{addiction.icon}</div>
-        <span className={`level-pill level-${addiction.level}`}>{LEVEL_LABELS[addiction.level]} risk</span>
+        <span className={`level-pill level-${addiction.level}`} style={{ background: levelBg[addiction.level], color: levelColors[addiction.level] }}>
+          {LEVEL_LABELS[addiction.level]} risk
+        </span>
       </div>
       <h3>{addiction.name}</h3>
       <p>{addiction.description}</p>
       <button className="addiction-card__toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        {open ? '▲ Məsləhətləri gizlət' : '▼ Məsləhətlər'}
+        {open ? '▲ Gizlət' : '▼ Məsləhətlər göstər'}
       </button>
       {open && (
         <ul className="addiction-card__tips">
@@ -315,7 +319,7 @@ function Header() {
       <div className="container site-header__inner">
         <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
           <img src="/logo.png" alt="Tergit.az logo" className="brand-logo" />
-          Tergit<span style={{ color: 'var(--accent)' }}>.az</span>
+          <span style={{ letterSpacing: '0.12em' }}>TERGIT<span style={{ color: 'var(--accent)' }}>.AZ</span></span>
         </Link>
 
         <nav className="nav-links" aria-label="Əsas naviqasiya">
@@ -662,25 +666,21 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ── ƏLAMƏTLƏr + TEST ── */}
       <section className="home-section">
         <div className="container">
-          <div className="home-section__label">Əlamətlər və test</div>
+          <div className="home-section__label">Əlamətlər</div>
           <h2 className="home-section__title">Asılılığın əlamətlərini tanı</h2>
           <p className="home-section__sub">Erkən tanıma — erkən müalicə. Bu əlamətlərdən biri sənə tanış gəlirsə, kömək almağı düşün.</p>
-          <div className="home-signs-layout">
-            <div className="home-signs-list">
-              {SIGNS.map((s, i) => (
-                <div key={i} className="home-sign-item">
-                  <div className="home-sign-num">{i + 1}</div>
-                  <div>
-                    <div className="home-sign-title">{s.title}</div>
-                    <div className="home-sign-desc">{s.desc}</div>
-                  </div>
+          <div className="home-signs-list" style={{ marginTop: 40 }}>
+            {SIGNS.map((s, i) => (
+              <div key={i} className="home-sign-item">
+                <div className="home-sign-num">{i + 1}</div>
+                <div>
+                  <div className="home-sign-title">{s.title}</div>
+                  <div className="home-sign-desc">{s.desc}</div>
                 </div>
-              ))}
-            </div>
-            <QuizWidget />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -796,7 +796,7 @@ function AddictionsPage() {
         <div className="container">
           <div className="section-head">
             <span className="section-head__eyebrow">Asılılıqlar</span>
-            <h2>7 əsas asılılıq növü</h2>
+            <h2>Əsas asılılıq növləri</h2>
             <p>Risk səviyyəsinə görə filtrlə və hər biri üçün konkret məsləhətlərə bax.</p>
           </div>
 
@@ -829,6 +829,8 @@ function AddictionsPage() {
 
 function PostCard({ post, category }) {
   const excerpt = post.content.split('\n')[0].slice(0, 130);
+  const date = new Date(post.createdAt);
+  const formattedDate = `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}.${date.getFullYear()}`;
   return (
     <Link to={`/bloq/${post.slug}`} className="post-card">
       {post.ogImage && <img className="post-card__image" src={post.ogImage} alt={post.title} loading="lazy" />}
@@ -838,10 +840,10 @@ function PostCard({ post, category }) {
             {category.name}
           </span>
         )}
-        <h3 className="post-card__title">{post.title}</h3>
-        <p className="post-card__excerpt">{excerpt}{post.content.length > 130 ? '…' : ''}</p>
+        <h3 className="post-card__title" style={{ color: '#1a1a1a', fontWeight: 800 }}>{post.title}</h3>
+        <p className="post-card__excerpt" style={{ color: '#4B5563' }}>{excerpt}{post.content.length > 130 ? '…' : ''}</p>
         <div className="post-card__meta">
-          <span>{new Date(post.createdAt).toLocaleDateString('az-AZ')}</span>
+          <span>{formattedDate}</span>
           <span>· {post.views || 0} baxış</span>
         </div>
       </div>
@@ -1026,14 +1028,14 @@ function BlogPostPage() {
       <article className="section">
         <div className="container post-detail">
           {post.ogImage && <img className="post-detail__cover" src={post.ogImage} alt={post.title} />}
-          <h1>{post.title}</h1>
+          <h1 style={{ color: '#1a1a1a', fontWeight: 800 }}>{post.title}</h1>
           <div className="post-detail__meta">
-            <span>{new Date(post.createdAt).toLocaleDateString('az-AZ', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span>{(() => { const d = new Date(post.createdAt); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; })()}</span>
             <span>· {post.views || 0} baxış</span>
           </div>
           <div className="post-detail__content">
             {post.content.split('\n').filter(Boolean).map((para, i) => (
-              <p key={i}>{para}</p>
+              <p key={i} style={{ color: '#1a1a1a' }}>{para}</p>
             ))}
           </div>
         </div>
@@ -1047,10 +1049,10 @@ function BlogPostPage() {
    ============================================================ */
 
 function ContactPage() {
-  const { addToast } = useToast();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [sent, setSent] = useState(false);
 
   function validate() {
     const errors = {};
@@ -1077,13 +1079,12 @@ function ContactPage() {
       });
       const json = await res.json();
       if (json.success) {
-        addToast(json.message || 'Mesajınız göndərildi.', 'success');
-        setForm({ name: '', email: '', message: '' });
+        setSent(true);
       } else {
-        addToast(json.message || 'Mesaj göndərilə bilmədi.', 'error');
+        setFieldErrors({ general: json.message || 'Mesaj göndərilə bilmədi.' });
       }
     } catch {
-      addToast('Server ilə əlaqə qurulmadı.', 'error');
+      setFieldErrors({ general: 'Server ilə əlaqə qurulmadı.' });
     } finally {
       setSubmitting(false);
     }
@@ -1095,6 +1096,39 @@ function ContactPage() {
     name: 'Tergit.az ilə əlaqə',
     url: `${SITE_URL}/elaqe`
   };
+
+  if (sent) {
+    return (
+      <div className="page-enter">
+        <SEO title="Mesaj göndərildi" path="/elaqe" noindex />
+        <section className="section">
+          <div className="container" style={{ maxWidth: 560, textAlign: 'center', padding: '60px 24px' }}>
+            <div style={{
+              width: 90, height: 90, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #1D9E75, #3FB950)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 28px', fontSize: 40, boxShadow: '0 12px 40px rgba(29,158,117,0.3)'
+            }}>✓</div>
+            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(26px,5vw,38px)', color: '#1a1a1a', marginBottom: 16 }}>
+              Mesajınız göndərildi!
+            </h1>
+            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.8, marginBottom: 36 }}>
+              Müraciətiniz üçün təşəkkür edirik. Tezliklə sizinlə əlaqə saxlayacağıq.
+            </p>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => { setSent(false); setForm({ name: '', email: '', message: '' }); }}
+              >
+                Yeni mesaj göndər
+              </button>
+              <Link to="/" className="btn btn-primary">Ana səhifəyə qayıt →</Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="page-enter">
@@ -1117,6 +1151,8 @@ function ContactPage() {
           <div style={{ marginBottom: 24 }}>
             <StatusBadge />
           </div>
+
+          {fieldErrors.general && <div className="error-banner">{fieldErrors.general}</div>}
 
           <form className="form-card" onSubmit={handleSubmit}>
             <div className="field">
