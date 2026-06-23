@@ -720,12 +720,7 @@ function HomePage() {
           <h2 className="home-section__title">Hansı asılılıqla mübarizə aparırsan?</h2>
           <p className="home-section__sub">Hər kateqoriya üçün konkret, tətbiq edilə bilən məsləhətlər hazırladıq.</p>
           <div className="home-types-grid">
-            {ADDICTIONS.map((a) => (
-              <AddictionCard key={a.id} addiction={a} />
-            ))}
-          </div>
-          <div className="home-types-grid" style={{ marginTop: 24 }}>
-            {ADDICTION_TYPES_EXT.map((a) => (
+            {[...ADDICTIONS, ...ADDICTION_TYPES_EXT].map((a) => (
               <AddictionCard key={a.id} addiction={a} />
             ))}
           </div>
@@ -839,9 +834,11 @@ function HomePage() {
 function AddictionsPage() {
   const [filter, setFilter] = useState('hamisi');
 
+  const allAddictions = [...ADDICTIONS, ...ADDICTION_TYPES_EXT];
+
   const filtered = useMemo(() => {
-    if (filter === 'hamisi') return ADDICTIONS;
-    return ADDICTIONS.filter((a) => a.level === filter);
+    if (filter === 'hamisi') return allAddictions;
+    return allAddictions.filter((a) => a.level === filter);
   }, [filter]);
 
   const filters = [
@@ -854,7 +851,7 @@ function AddictionsPage() {
   return (
     <div className="page-enter">
       <SEO
-        title="Asılılıqlar — 7 Növ və Məsləhətlər"
+        title="Asılılıqlar — Növlər və Məsləhətlər"
         description="Sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılığı haqqında məlumat və praktiki məsləhətlər."
         keywords="asılılıq növləri, sosial media asılılığı, oyun asılılığı, siqaret, kofein, fast food, alkoqol, narkotik"
         path="/asililiqlar"
