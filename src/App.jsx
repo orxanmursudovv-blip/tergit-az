@@ -902,7 +902,9 @@ function PostCard({ post, category }) {
   const formattedDate = `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}.${date.getFullYear()}`;
   return (
     <Link to={`/bloq/${post.slug}`} className="post-card">
-      {post.ogImage && <img className="post-card__image" src={post.ogImage} alt={post.title} loading="lazy" />}
+      {(post.featuredImage || post.ogImage) && (
+        <img className="post-card__image" src={post.featuredImage || post.ogImage} alt={post.featuredImageAlt || post.title} loading="lazy" />
+      )}
       <div className="post-card__body">
         {category && (
           <span className="post-card__cat" style={{ background: `${category.color}22`, color: category.color }}>
@@ -1023,6 +1025,31 @@ function BlogListPage() {
    BLOG POST PAGE
    ============================================================ */
 
+function FaqItem({ faq }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: 10, overflow: 'hidden' }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: '100%', textAlign: 'left', padding: '16px 20px',
+          background: 'transparent', border: 'none', cursor: 'pointer',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          fontWeight: 700, fontSize: 15, color: '#1a1a1a'
+        }}
+      >
+        {faq.q}
+        <span style={{ fontSize: 18, color: 'var(--accent)', marginLeft: 12, flexShrink: 0 }}>{open ? '−' : '+'}</span>
+      </button>
+      {open && (
+        <div style={{ padding: '0 20px 16px', fontSize: 15, color: '#555E63', lineHeight: 1.7 }}>
+          {faq.a}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BlogPostPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -1096,7 +1123,13 @@ function BlogPostPage() {
 
       <article className="section">
         <div className="container post-detail">
-          {post.ogImage && <img className="post-detail__cover" src={post.ogImage} alt={post.title} />}
+          {(post.featuredImage || post.ogImage) && (
+            <img
+              className="post-detail__cover"
+              src={post.featuredImage || post.ogImage}
+              alt={post.featuredImageAlt || post.title}
+            />
+          )}
           <h1 style={{ color: '#1a1a1a', fontWeight: 800 }}>{post.title}</h1>
           <div className="post-detail__meta">
             <span>{(() => { const d = new Date(post.createdAt); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; })()}</span>
@@ -1107,6 +1140,17 @@ function BlogPostPage() {
               <p key={i} style={{ color: '#1a1a1a' }}>{para}</p>
             ))}
           </div>
+
+          {post.faqs && post.faqs.length > 0 && post.showFaqOnPage !== false && (
+            <div className="post-faq" style={{ marginTop: 48 }}>
+              <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: 22, marginBottom: 20 }}>Tez-tez verilən suallar</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {post.faqs.map((faq, i) => (
+                  <FaqItem key={i} faq={faq} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </article>
     </div>
