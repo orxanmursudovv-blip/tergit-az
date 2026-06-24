@@ -1373,6 +1373,13 @@ function PageModal({ page, token, addToast, onClose, onSaved }) {
   );
 }
 
+const STATIC_PAGES = [
+  { id: 'static_home', title: 'Ana Səhifə', slug: '', active: true, showInMenu: true, menuOrder: 0, isStatic: true },
+  { id: 'static_addictions', title: 'Asılılıqlar', slug: 'asililiqlar', active: true, showInMenu: true, menuOrder: 1, isStatic: true },
+  { id: 'static_blog', title: 'Bloq', slug: 'bloq', active: true, showInMenu: true, menuOrder: 2, isStatic: true },
+  { id: 'static_contact', title: 'Əlaqə', slug: 'elaqe', active: true, showInMenu: true, menuOrder: 3, isStatic: true },
+];
+
 function PagesPanel({ token, onAuthError }) {
   const { addToast } = useToast();
   const [pages, setPages] = useState([]);
@@ -1391,7 +1398,10 @@ function PagesPanel({ token, onAuthError }) {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const allPages = [...STATIC_PAGES, ...pages];
+
   async function handleDelete(page) {
+    if (page.isStatic) { addToast('Statik səhifələr silinə bilməz.', 'error'); return; }
     if (!window.confirm(`"${page.title}" səhifəsini silmək istədiyinizə əminsiniz?`)) return;
     const res = await apiRequest(`/api/pages/${page.id}`, { method: 'DELETE', token });
     if (res.authError) return onAuthError();
@@ -1400,6 +1410,7 @@ function PagesPanel({ token, onAuthError }) {
   }
 
   async function handleToggleActive(page) {
+    if (page.isStatic) { addToast('Statik səhifələr deaktiv edilə bilməz.', 'error'); return; }
     const res = await apiRequest(`/api/pages/${page.id}`, { method: 'PUT', token, body: { active: !page.active } });
     if (res.authError) return onAuthError();
     if (res.success) { addToast(page.active ? 'Səhifə deaktiv edildi.' : 'Səhifə aktiv edildi.', 'success'); loadData(); }
@@ -1417,40 +1428,47 @@ function PagesPanel({ token, onAuthError }) {
       {error && <div className="error-banner">{error}</div>}
       <div className="panel">
         <div className="panel-head">
-          <h3>Bütün səhifələr ({pages.length})</h3>
+          <h3>Bütün səhifələr ({allPages.length})</h3>
         </div>
         <table>
           <thead>
             <tr>
               <th>Başlıq</th>
               <th>Slug</th>
+              <th>Növ</th>
               <th>Status</th>
               <th>Menyu</th>
-              <th>Sıra</th>
               <th>Əməliyyat</th>
             </tr>
           </thead>
           <tbody>
             {loading && <tr className="empty-row"><td colSpan={6}>Yüklənir…</td></tr>}
-            {!loading && pages.length === 0 && <tr className="empty-row"><td colSpan={6}>Hələ səhifə yoxdur.</td></tr>}
-            {!loading && pages.map((p) => (
+            {!loading && allPages.map((p) => (
               <tr key={p.id}>
                 <td>{p.title}</td>
                 <td><code style={{ fontSize: 12, color: 'var(--muted)' }}>/{p.slug}</code></td>
+                <td>
+                  <span className={`tag-pill ${p.isStatic ? 'pill-muted' : 'pill-success'}`}>
+                    {p.isStatic ? 'Statik' : 'Dinamik'}
+                  </span>
+                </td>
                 <td>
                   <span className={`tag-pill ${p.active ? 'pill-success' : 'pill-muted'}`}>
                     {p.active ? 'Aktiv' : 'Passiv'}
                   </span>
                 </td>
                 <td>{p.showInMenu ? '✓' : '—'}</td>
-                <td>{p.menuOrder || 0}</td>
                 <td>
                   <div className="row-actions">
-                    <button className="icon-btn" title={p.active ? 'Deaktiv et' : 'Aktiv et'} onClick={() => handleToggleActive(p)}>
-                      {p.active ? '🙈' : '👁'}
-                    </button>
+                    {!p.isStatic && (
+                      <button className="icon-btn" title={p.active ? 'Deaktiv et' : 'Aktiv et'} onClick={() => handleToggleActive(p)}>
+                        {p.active ? '🙈' : '👁'}
+                      </button>
+                    )}
                     <button className="icon-btn" title="Redaktə et" onClick={() => setModalState({ open: true, page: p })}>✎</button>
-                    <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
+                    {!p.isStatic && (
+                      <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
+                    )}
                   </div>
                 </td>
               </tr>
