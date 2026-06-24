@@ -54,7 +54,9 @@ const FILES = {
   subscribers: path.join(DATA_DIR, 'subscribers.json'),
   posts: path.join(DATA_DIR, 'posts.json'),
   categories: path.join(DATA_DIR, 'categories.json'),
-  blockedIps: path.join(DATA_DIR, 'blocked-ips.json')
+  blockedIps: path.join(DATA_DIR, 'blocked-ips.json'),
+  pages: path.join(DATA_DIR, 'pages.json'),
+  robotsTxt: path.join(DATA_DIR, 'robots.txt')
 };
 
 const SEED_CATEGORIES = [
@@ -109,12 +111,16 @@ function emptyArrayFile() {
 async function ensureDataFiles() {
   await fsp.mkdir(DATA_DIR, { recursive: true });
 
+  const DEFAULT_ROBOTS = `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\n\nSitemap: ${SITE_URL}/sitemap.xml`;
+
   const defaults = {
     [FILES.messages]: emptyArrayFile(),
     [FILES.subscribers]: emptyArrayFile(),
     [FILES.posts]: JSON.stringify(SEED_POSTS, null, 2),
     [FILES.categories]: JSON.stringify(SEED_CATEGORIES, null, 2),
-    [FILES.blockedIps]: '{}'
+    [FILES.blockedIps]: '{}',
+    [FILES.pages]: emptyArrayFile(),
+    [FILES.robotsTxt]: DEFAULT_ROBOTS
   };
 
   for (const [filePath, defaultContent] of Object.entries(defaults)) {
@@ -798,41 +804,52 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
 
 app.get('/sitemap.xml', async (req, res) => {
   try {
-    const posts = await readData(FILES.posts);
-    const publishedPosts = posts.filter((p) => p.published);
+    const [posts, categories] = await Promise.all([
+      readData(FILES.posts),
+      readData(FILES.categories)
+    ]);
+
+    const now = new Date().toISOString().split('T')[0];
 
     const staticUrls = [
-      { loc: '/', priority: '1.0', changefreq: 'daily' },
-      { loc: '/asililiqlar', priority: '0.9', changefreq: 'weekly' },
-      { loc: '/bloq', priority: '0.9', changefreq: 'daily' },
-      { loc: '/elaqe', priority: '0.6', changefreq: 'monthly' }
+      { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: now },
+      { loc: '/asililiqlar', priority: '0.9', changefreq: 'weekly', lastmod: now },
+      { loc: '/bloq', priority: '0.9', changefreq: 'daily', lastmod: now },
+      { loc: '/elaqe', priority: '0.6', changefreq: 'monthly', lastmod: now }
     ];
 
     const urlEntries = staticUrls
-      .map(
-        (u) => `  <url>
+      .map((u) => `  <url>
     <loc>${SITE_URL}${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
-  </url>`
-      )
-      .join('\n');
+  </url>`).join('\n');
 
+    // Yalnız dərc olunmuş və inSitemap:false olmayan məqalələr
+    const publishedPosts = posts.filter((p) => p.published && p.inSitemap !== false);
     const postEntries = publishedPosts
-      .map(
-        (p) => `  <url>
+      .map((p) => `  <url>
     <loc>${SITE_URL}/bloq/${p.slug}</loc>
-    <lastmod>${p.updatedAt.split('T')[0]}</lastmod>
+    <lastmod>${(p.updatedAt || p.createdAt || now).split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-  </url>`
-      )
-      .join('\n');
+  </url>`).join('\n');
+
+    // Kateqoriyalar
+    const catEntries = categories
+      .map((c) => `  <url>
+    <loc>${SITE_URL}/bloq?cat=${c.slug}</loc>
+    <lastmod>${(c.updatedAt || c.createdAt || now).split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>`).join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urlEntries}
 ${postEntries}
+${catEntries}
 </urlset>`;
 
     res.header('Content-Type', 'application/xml');
@@ -843,16 +860,104 @@ ${postEntries}
   }
 });
 
-app.get('/robots.txt', (req, res) => {
-  const content = `User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /api
-
-Sitemap: ${SITE_URL}/sitemap.xml`;
-  res.header('Content-Type', 'text/plain');
-  return res.send(content);
+app.get('/robots.txt', async (req, res) => {
+  try {
+    const content = await fsp.readFile(FILES.robotsTxt, 'utf-8');
+    res.header('Content-Type', 'text/plain');
+    return res.send(content);
+  } catch {
+    res.header('Content-Type', 'text/plain');
+    return res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\n\nSitemap: ${SITE_URL}/sitemap.xml`);
+  }
 });
+
+/* ============================================================
+   ROUTES — SƏHİFƏ İDARƏSİ
+   ============================================================ */
+
+app.get('/api/pages', authenticateToken, async (req, res) => {
+  try {
+    const pages = await readData(FILES.pages);
+    return success(res, pages, 'Səhifələr gətirildi.');
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500, 'Səhifələr yüklənə bilmədi.');
+  }
+});
+
+app.post('/api/pages', authenticateToken, async (req, res) => {
+  try {
+    const { title, slug, content, active, showInMenu, menuOrder, featuredImage, metaTitle, metaDescription, canonicalUrl, robotsMeta, inSitemap, ogImage, ogTitle, ogDescription } = req.body;
+    if (!title?.trim() || !slug?.trim()) return failure(res, 'VALIDATION', 400, 'Başlıq və slug tələb olunur.');
+    const pages = await readData(FILES.pages);
+    if (pages.find((p) => p.slug === slug.trim())) return failure(res, 'DUPLICATE', 409, 'Bu slug artıq mövcuddur.');
+    const page = {
+      id: `page_${Date.now()}`,
+      title: title.trim(), slug: slug.trim(), content: content || '',
+      active: active !== false, showInMenu: showInMenu !== false,
+      menuOrder: parseInt(menuOrder) || 0,
+      featuredImage: featuredImage || '', metaTitle: metaTitle || '',
+      metaDescription: metaDescription || '', canonicalUrl: canonicalUrl || '',
+      robotsMeta: robotsMeta || 'index', inSitemap: inSitemap !== false,
+      ogImage: ogImage || '', ogTitle: ogTitle || '', ogDescription: ogDescription || '',
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+    };
+    pages.push(page);
+    await writeData(FILES.pages, pages);
+    return success(res, page, 'Səhifə əlavə edildi.');
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500, 'Səhifə əlavə edilə bilmədi.');
+  }
+});
+
+app.put('/api/pages/:id', authenticateToken, async (req, res) => {
+  try {
+    const pages = await readData(FILES.pages);
+    const idx = pages.findIndex((p) => p.id === req.params.id);
+    if (idx === -1) return failure(res, 'NOT_FOUND', 404, 'Səhifə tapılmadı.');
+    pages[idx] = { ...pages[idx], ...req.body, id: pages[idx].id, updatedAt: new Date().toISOString() };
+    await writeData(FILES.pages, pages);
+    return success(res, pages[idx], 'Səhifə yeniləndi.');
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500, 'Səhifə yenilənə bilmədi.');
+  }
+});
+
+app.delete('/api/pages/:id', authenticateToken, async (req, res) => {
+  try {
+    const pages = await readData(FILES.pages);
+    const filtered = pages.filter((p) => p.id !== req.params.id);
+    if (filtered.length === pages.length) return failure(res, 'NOT_FOUND', 404, 'Səhifə tapılmadı.');
+    await writeData(FILES.pages, filtered);
+    return success(res, null, 'Səhifə silindi.');
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500, 'Səhifə silinə bilmədi.');
+  }
+});
+
+/* ============================================================
+   SEO: ROBOTS.TXT ADMIN API
+   ============================================================ */
+
+app.get('/api/seo/robots', authenticateToken, async (req, res) => {
+  try {
+    const content = await fsp.readFile(FILES.robotsTxt, 'utf-8');
+    return success(res, { content }, 'robots.txt oxundu.');
+  } catch {
+    return failure(res, 'NOT_FOUND', 404, 'robots.txt tapılmadı.');
+  }
+});
+
+app.put('/api/seo/robots', authenticateToken, async (req, res) => {
+  try {
+    const { content } = req.body;
+    if (typeof content !== 'string') return failure(res, 'MISSING', 400, 'Məzmun tələb olunur.');
+    await fsp.writeFile(FILES.robotsTxt, content, 'utf-8');
+    return success(res, { content }, 'robots.txt saxlanıldı.');
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500, 'Server xətası.');
+  }
+});
+
 
 /* ============================================================
    PRODUCTION: REACT BUILD-İNİ TƏQDİM ET
