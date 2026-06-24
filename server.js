@@ -638,13 +638,24 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const metaTitle = sanitizeText(req.body?.metaTitle) || title;
     const metaDescription = sanitizeText(req.body?.metaDescription, { multiline: true });
     const metaKeywords = sanitizeText(req.body?.metaKeywords);
+    const focusKeyword = sanitizeText(req.body?.focusKeyword);
+    const canonicalUrl = sanitizeText(req.body?.canonicalUrl);
+    const robotsMeta = req.body?.robotsMeta === 'noindex' ? 'noindex' : 'index';
+    const inSitemap = req.body?.inSitemap !== false;
     const ogImage = sanitizeText(req.body?.ogImage);
+    const featuredImage = sanitizeText(req.body?.featuredImage);
+    const featuredImageAlt = sanitizeText(req.body?.featuredImageAlt);
+    const useFeaturedAsOg = req.body?.useFeaturedAsOg !== false;
+    const faqs = Array.isArray(req.body?.faqs) ? req.body.faqs : [];
+    const showFaqOnPage = req.body?.showFaqOnPage !== false;
     const published = Boolean(req.body?.published);
 
     if (!title || !content || !categoryId) {
       return failure(res, 'MISSING_FIELDS', 400, 'Başlıq, məzmun və kateqoriya tələb olunur.');
     }
-    if (ogImage && !validator.isURL(ogImage, { require_protocol: true })) {
+
+    const finalOgImage = useFeaturedAsOg ? featuredImage : ogImage;
+    if (finalOgImage && !validator.isURL(finalOgImage, { require_protocol: true })) {
       return failure(res, 'INVALID_URL', 400, 'OG şəkil URL düzgün formatda olmalıdır.');
     }
 
@@ -666,23 +677,16 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const now = new Date().toISOString();
     const newPost = {
       id: generateId('post'),
-      title,
-      slug,
-      categoryId,
-      content,
-      metaTitle,
-      metaDescription,
-      metaKeywords,
-      ogImage,
-      published,
-      createdAt: now,
-      updatedAt: now,
-      views: 0
+      title, slug, categoryId, content,
+      metaTitle, metaDescription, metaKeywords,
+      focusKeyword, canonicalUrl, robotsMeta, inSitemap,
+      ogImage: finalOgImage, featuredImage, featuredImageAlt,
+      useFeaturedAsOg, faqs, showFaqOnPage,
+      published, createdAt: now, updatedAt: now, views: 0
     };
 
     posts.push(newPost);
     await writeData(FILES.posts, posts);
-
     return success(res, newPost, 'Məqalə əlavə edildi.', 201);
   } catch (err) {
     console.error(err);
@@ -706,14 +710,21 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
     const metaTitle = req.body?.metaTitle !== undefined ? sanitizeText(req.body.metaTitle) : existing.metaTitle;
     const metaDescription = req.body?.metaDescription !== undefined ? sanitizeText(req.body.metaDescription, { multiline: true }) : existing.metaDescription;
     const metaKeywords = req.body?.metaKeywords !== undefined ? sanitizeText(req.body.metaKeywords) : existing.metaKeywords;
-    const ogImage = req.body?.ogImage !== undefined ? sanitizeText(req.body.ogImage) : existing.ogImage;
+    const focusKeyword = req.body?.focusKeyword !== undefined ? sanitizeText(req.body.focusKeyword) : existing.focusKeyword;
+    const canonicalUrl = req.body?.canonicalUrl !== undefined ? sanitizeText(req.body.canonicalUrl) : existing.canonicalUrl;
+    const robotsMeta = req.body?.robotsMeta !== undefined ? (req.body.robotsMeta === 'noindex' ? 'noindex' : 'index') : existing.robotsMeta;
+    const inSitemap = req.body?.inSitemap !== undefined ? req.body.inSitemap !== false : existing.inSitemap;
+    const featuredImage = req.body?.featuredImage !== undefined ? sanitizeText(req.body.featuredImage) : existing.featuredImage;
+    const featuredImageAlt = req.body?.featuredImageAlt !== undefined ? sanitizeText(req.body.featuredImageAlt) : existing.featuredImageAlt;
+    const useFeaturedAsOg = req.body?.useFeaturedAsOg !== undefined ? Boolean(req.body.useFeaturedAsOg) : existing.useFeaturedAsOg;
+    const rawOgImage = req.body?.ogImage !== undefined ? sanitizeText(req.body.ogImage) : existing.ogImage;
+    const ogImage = useFeaturedAsOg ? featuredImage : rawOgImage;
+    const faqs = req.body?.faqs !== undefined ? (Array.isArray(req.body.faqs) ? req.body.faqs : []) : (existing.faqs || []);
+    const showFaqOnPage = req.body?.showFaqOnPage !== undefined ? Boolean(req.body.showFaqOnPage) : existing.showFaqOnPage;
     const published = req.body?.published !== undefined ? Boolean(req.body.published) : existing.published;
 
     if (!title || !content || !categoryId) {
       return failure(res, 'MISSING_FIELDS', 400, 'Başlıq, məzmun və kateqoriya tələb olunur.');
-    }
-    if (ogImage && !validator.isURL(ogImage, { require_protocol: true })) {
-      return failure(res, 'INVALID_URL', 400, 'OG şəkil URL düzgün formatda olmalıdır.');
     }
     if (!slug) {
       return failure(res, 'INVALID_SLUG', 400, 'Slug boş ola bilməz.');
@@ -731,15 +742,11 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
 
     posts[index] = {
       ...existing,
-      title,
-      content,
-      categoryId,
-      slug,
-      metaTitle,
-      metaDescription,
-      metaKeywords,
-      ogImage,
-      published,
+      title, content, categoryId, slug,
+      metaTitle, metaDescription, metaKeywords,
+      focusKeyword, canonicalUrl, robotsMeta, inSitemap,
+      ogImage, featuredImage, featuredImageAlt, useFeaturedAsOg,
+      faqs, showFaqOnPage, published,
       updatedAt: new Date().toISOString()
     };
 
