@@ -675,7 +675,7 @@ function HomePage() {
               mübarizədə sənə praktiki məsləhətlər, real bilgi və dəstək təklif edir.
             </p>
             <div className="home-hero__btns">
-              <Link to="/asililiqlar" className="btn btn-primary">7 asılılığı kəşf et →</Link>
+              <Link to="/asililiqlar" className="btn btn-primary">Asılılıqları kəşf et →</Link>
               <Link to="/bloq" className="btn btn-ghost">Bloqu oxu</Link>
             </div>
             <div className="home-hero__stats">
@@ -688,8 +688,8 @@ function HomePage() {
                 <span className="home-hero__stat-lbl">Pulsuz məlumat</span>
               </div>
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">Az #1</span>
-                <span className="home-hero__stat-lbl">Asılılıq platforması</span>
+                <span className="home-hero__stat-num">5000+</span>
+                <span className="home-hero__stat-lbl">Aktiv oxucu</span>
               </div>
             </div>
           </div>
@@ -720,12 +720,16 @@ function HomePage() {
           <h2 className="home-section__title">Hansı asılılıqla mübarizə aparırsan?</h2>
           <p className="home-section__sub">Hər kateqoriya üçün konkret, tətbiq edilə bilən məsləhətlər hazırladıq.</p>
           <div className="home-types-grid">
-            {[...ADDICTIONS, ...ADDICTION_TYPES_EXT].map((a) => (
+            {[
+              [...ADDICTIONS, ...ADDICTION_TYPES_EXT].find(a => a.id === 'siqaret'),
+              [...ADDICTIONS, ...ADDICTION_TYPES_EXT].find(a => a.id === 'alkoqol'),
+              [...ADDICTIONS, ...ADDICTION_TYPES_EXT].find(a => a.id === 'qumar'),
+            ].filter(Boolean).map((a) => (
               <AddictionCard key={a.id} addiction={a} />
             ))}
           </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <Link to="/asililiqlar" className="btn btn-ghost">Bütün asılılıqları gör</Link>
+            <Link to="/asililiqlar" className="btn btn-ghost">Bütün asılılıqları gör →</Link>
           </div>
         </div>
       </section>
@@ -1211,10 +1215,6 @@ function ContactPage() {
             <span className="section-head__eyebrow">Əlaqə</span>
             <h2>Bizimlə əlaqə saxlayın</h2>
             <p>Sualların, təklifin və ya dəstək ehtiyacın varsa, aşağıdaki formu doldur.</p>
-          </div>
-
-          <div style={{ marginBottom: 24 }}>
-            <StatusBadge />
           </div>
 
           {fieldErrors.general && <div className="error-banner">{fieldErrors.general}</div>}
