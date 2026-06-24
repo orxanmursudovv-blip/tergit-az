@@ -284,6 +284,7 @@ function DashboardPanel({ token, onAuthError }) {
 
 function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
   const isEdit = Boolean(post);
+  const [activeSection, setActiveSection] = useState('content');
   const [form, setForm] = useState({
     title: post?.title || '',
     slug: post?.slug || '',
@@ -292,7 +293,16 @@ function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
     metaTitle: post?.metaTitle || '',
     metaDescription: post?.metaDescription || '',
     metaKeywords: post?.metaKeywords || '',
+    focusKeyword: post?.focusKeyword || '',
+    canonicalUrl: post?.canonicalUrl || '',
+    robotsMeta: post?.robotsMeta || 'index',
+    inSitemap: post?.inSitemap !== false,
+    featuredImage: post?.featuredImage || '',
+    featuredImageAlt: post?.featuredImageAlt || '',
     ogImage: post?.ogImage || '',
+    useFeaturedAsOg: post?.useFeaturedAsOg !== false,
+    faqs: post?.faqs || [],
+    showFaqOnPage: post?.showFaqOnPage !== false,
     published: post?.published || false
   });
   const [saving, setSaving] = useState(false);
@@ -300,6 +310,32 @@ function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  function addFaq() {
+    setForm((f) => ({ ...f, faqs: [...f.faqs, { q: '', a: '' }] }));
+  }
+
+  function updateFaq(i, field, value) {
+    setForm((f) => {
+      const faqs = [...f.faqs];
+      faqs[i] = { ...faqs[i], [field]: value };
+      return { ...f, faqs };
+    });
+  }
+
+  function removeFaq(i) {
+    setForm((f) => ({ ...f, faqs: f.faqs.filter((_, idx) => idx !== i) }));
+  }
+
+  function moveFaq(i, dir) {
+    setForm((f) => {
+      const faqs = [...f.faqs];
+      const j = i + dir;
+      if (j < 0 || j >= faqs.length) return f;
+      [faqs[i], faqs[j]] = [faqs[j], faqs[i]];
+      return { ...f, faqs };
+    });
   }
 
   async function handleSubmit(e) {
@@ -310,13 +346,13 @@ function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
       return;
     }
     setSaving(true);
+    const body = { ...form, ogImage: form.useFeaturedAsOg ? form.featuredImage : form.ogImage };
     const res = await apiRequest(isEdit ? `/api/posts/${post.id}` : '/api/posts', {
       method: isEdit ? 'PUT' : 'POST',
       token,
-      body: form
+      body
     });
     setSaving(false);
-
     if (res.success) {
       addToast(res.message || (isEdit ? 'Məqalə yeniləndi.' : 'Məqalə əlavə edildi.'), 'success');
       onSaved();
@@ -325,87 +361,172 @@ function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
     }
   }
 
+  const sections = [
+    { id: 'content', label: '📝 Məzmun' },
+    { id: 'image', label: '🖼 Şəkil' },
+    { id: 'seo', label: '🔍 SEO' },
+    { id: 'faq', label: '❓ FAQ' }
+  ];
+
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-card">
+      <div className="modal-card" style={{ maxWidth: 760 }}>
         <h3>{isEdit ? 'Məqaləni redaktə et' : 'Yeni məqalə əlavə et'}</h3>
+
+        <div className="filter-row" style={{ marginBottom: 24 }}>
+          {sections.map((s) => (
+            <button key={s.id} type="button" className={`filter-chip ${activeSection === s.id ? 'active' : ''}`} onClick={() => setActiveSection(s.id)}>
+              {s.label}
+            </button>
+          ))}
+        </div>
 
         {error && <div className="error-banner">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="post-title">Başlıq</label>
-              <input id="post-title" type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
-            </div>
-            <div className="field">
-              <label htmlFor="post-slug">Slug (boş saxlasan avtomatik yaranır)</label>
-              <input id="post-slug" type="text" value={form.slug} onChange={(e) => update('slug', e.target.value)} />
-            </div>
-          </div>
 
-          <div className="field">
-            <label htmlFor="post-category">Kateqoriya</label>
-            <select id="post-category" value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)}>
-              {categories.length === 0 && <option value="">Əvvəlcə kateqoriya yaradın</option>}
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+          {activeSection === 'content' && (
+            <>
+              <div className="field-row">
+                <div className="field">
+                  <label>Başlıq *</label>
+                  <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>URL Slug</label>
+                  <input type="text" value={form.slug} placeholder="avtomatik yaranır" onChange={(e) => update('slug', e.target.value)} />
+                </div>
+              </div>
+              <div className="field">
+                <label>Kateqoriya *</label>
+                <select value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)}>
+                  {categories.length === 0 && <option value="">Əvvəlcə kateqoriya yaradın</option>}
+                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label>Məzmun *</label>
+                <textarea value={form.content} onChange={(e) => update('content', e.target.value)} style={{ minHeight: 220 }} />
+              </div>
+              <div className="checkbox-row">
+                <input id="post-published" type="checkbox" checked={form.published} onChange={(e) => update('published', e.target.checked)} />
+                <label htmlFor="post-published">Dərc olunsun (saytda görünsün)</label>
+              </div>
+            </>
+          )}
+
+          {activeSection === 'image' && (
+            <>
+              <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 16 }}>
+                Tövsiyə olunan ölçü: <strong>1200×630 px</strong> · Dəstəklənən: JPG, PNG, WebP
+              </p>
+              <div className="field">
+                <label>Əsas şəkil URL (Featured Image)</label>
+                <input type="text" value={form.featuredImage} placeholder="https://..." onChange={(e) => update('featuredImage', e.target.value)} />
+              </div>
+              <div className="field">
+                <label>Şəkil Alt Text (SEO)</label>
+                <input type="text" value={form.featuredImageAlt} placeholder="Şəkli təsvir edin..." onChange={(e) => update('featuredImageAlt', e.target.value)} />
+              </div>
+              {form.featuredImage && (
+                <div style={{ marginBottom: 20 }}>
+                  <img src={form.featuredImage} alt="preview" style={{ maxWidth: '100%', borderRadius: 8, maxHeight: 200, objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
+                </div>
+              )}
+              <div className="checkbox-row" style={{ marginBottom: 16 }}>
+                <input id="use-featured-og" type="checkbox" checked={form.useFeaturedAsOg} onChange={(e) => update('useFeaturedAsOg', e.target.checked)} />
+                <label htmlFor="use-featured-og">Əsas şəkli Open Graph şəkli kimi istifadə et</label>
+              </div>
+              {!form.useFeaturedAsOg && (
+                <div className="field">
+                  <label>Open Graph şəkli (ayrıca)</label>
+                  <input type="text" value={form.ogImage} placeholder="https://..." onChange={(e) => update('ogImage', e.target.value)} />
+                </div>
+              )}
+            </>
+          )}
+
+          {activeSection === 'seo' && (
+            <>
+              <div className="field">
+                <label>SEO Başlığı</label>
+                <input type="text" value={form.metaTitle} placeholder={form.title} onChange={(e) => update('metaTitle', e.target.value)} />
+                <div className="field-hint">{form.metaTitle.length}/60 simvol (tövsiyə: 50–60)</div>
+              </div>
+              <div className="field">
+                <label>Meta Description</label>
+                <textarea value={form.metaDescription} onChange={(e) => update('metaDescription', e.target.value)} style={{ minHeight: 80 }} />
+                <div className="field-hint">{form.metaDescription.length}/160 simvol (tövsiyə: 120–160)</div>
+              </div>
+              <div className="field-row">
+                <div className="field">
+                  <label>Fokus Açar Söz</label>
+                  <input type="text" value={form.focusKeyword} onChange={(e) => update('focusKeyword', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Meta Açar Sözlər</label>
+                  <input type="text" value={form.metaKeywords} placeholder="vergüllə ayırın" onChange={(e) => update('metaKeywords', e.target.value)} />
+                </div>
+              </div>
+              <div className="field">
+                <label>Canonical URL</label>
+                <input type="text" value={form.canonicalUrl} placeholder={`https://tergit.az/bloq/${form.slug}`} onChange={(e) => update('canonicalUrl', e.target.value)} />
+              </div>
+              <div className="field-row">
+                <div className="field">
+                  <label>İndeksləmə</label>
+                  <select value={form.robotsMeta} onChange={(e) => update('robotsMeta', e.target.value)}>
+                    <option value="index">index, follow</option>
+                    <option value="noindex">noindex, nofollow</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Sitemap</label>
+                  <select value={form.inSitemap ? 'yes' : 'no'} onChange={(e) => update('inSitemap', e.target.value === 'yes')}>
+                    <option value="yes">Sitemap-a əlavə et</option>
+                    <option value="no">Sitemap-dan çıxart</option>
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeSection === 'faq' && (
+            <>
+              <div className="checkbox-row" style={{ marginBottom: 20 }}>
+                <input id="faq-show" type="checkbox" checked={form.showFaqOnPage} onChange={(e) => update('showFaqOnPage', e.target.checked)} />
+                <label htmlFor="faq-show">FAQ-ları səhifədə göstər</label>
+              </div>
+              {form.faqs.length === 0 && (
+                <div className="empty-state" style={{ marginBottom: 20 }}>Hələ FAQ yoxdur.</div>
+              )}
+              {form.faqs.map((faq, i) => (
+                <div key={i} style={{ background: 'var(--surface-2)', borderRadius: 8, padding: 16, marginBottom: 12, border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--muted)' }}>FAQ #{i + 1}</span>
+                    <div className="row-actions">
+                      <button type="button" className="icon-btn" onClick={() => moveFaq(i, -1)} disabled={i === 0}>↑</button>
+                      <button type="button" className="icon-btn" onClick={() => moveFaq(i, 1)} disabled={i === form.faqs.length - 1}>↓</button>
+                      <button type="button" className="icon-btn" style={{ color: 'var(--danger)' }} onClick={() => removeFaq(i)}>🗑</button>
+                    </div>
+                  </div>
+                  <div className="field" style={{ marginBottom: 10 }}>
+                    <label>Sual</label>
+                    <input type="text" value={faq.q} onChange={(e) => updateFaq(i, 'q', e.target.value)} />
+                  </div>
+                  <div className="field" style={{ marginBottom: 0 }}>
+                    <label>Cavab</label>
+                    <textarea value={faq.a} onChange={(e) => updateFaq(i, 'a', e.target.value)} style={{ minHeight: 80 }} />
+                  </div>
+                </div>
               ))}
-            </select>
-          </div>
+              <button type="button" className="btn btn-ghost" onClick={addFaq} style={{ width: '100%' }}>
+                + FAQ əlavə et
+              </button>
+            </>
+          )}
 
-          <div className="field">
-            <label htmlFor="post-content">Məzmun</label>
-            <textarea
-              id="post-content"
-              value={form.content}
-              onChange={(e) => update('content', e.target.value)}
-              style={{ minHeight: 180 }}
-            />
-          </div>
-
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="post-meta-title">Meta başlıq (SEO)</label>
-              <input id="post-meta-title" type="text" value={form.metaTitle} onChange={(e) => update('metaTitle', e.target.value)} />
-            </div>
-            <div className="field">
-              <label htmlFor="post-meta-keywords">Meta açar sözlər</label>
-              <input id="post-meta-keywords" type="text" value={form.metaKeywords} onChange={(e) => update('metaKeywords', e.target.value)} />
-            </div>
-          </div>
-
-          <div className="field">
-            <label htmlFor="post-meta-description">Meta açıqlama (SEO)</label>
-            <textarea
-              id="post-meta-description"
-              value={form.metaDescription}
-              onChange={(e) => update('metaDescription', e.target.value)}
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="post-og-image">OG şəkil URL</label>
-            <input
-              id="post-og-image"
-              type="text"
-              placeholder="https://..."
-              value={form.ogImage}
-              onChange={(e) => update('ogImage', e.target.value)}
-            />
-          </div>
-
-          <div className="checkbox-row">
-            <input
-              id="post-published"
-              type="checkbox"
-              checked={form.published}
-              onChange={(e) => update('published', e.target.checked)}
-            />
-            <label htmlFor="post-published">Dərc olunsun (saytda görünsün)</label>
-          </div>
-
-          <div className="row-actions" style={{ marginTop: 22, justifyContent: 'flex-end' }}>
+          <div className="row-actions" style={{ marginTop: 24, justifyContent: 'flex-end' }}>
             <button type="button" className="btn btn-ghost" onClick={onClose}>Ləğv et</button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Saxlanılır…' : 'Saxla'}
@@ -1081,6 +1202,276 @@ function SeoPanel() {
 }
 
 /* ============================================================
+   SƏHİFƏ İDARƏSİ PANELİ
+   ============================================================ */
+
+function PageModal({ page, token, addToast, onClose, onSaved }) {
+  const isEdit = !!page;
+  const [form, setForm] = useState({
+    title: page?.title || '',
+    slug: page?.slug || '',
+    content: page?.content || '',
+    active: page?.active !== false,
+    showInMenu: page?.showInMenu !== false,
+    menuOrder: page?.menuOrder || 0,
+    featuredImage: page?.featuredImage || '',
+    metaTitle: page?.metaTitle || '',
+    metaDescription: page?.metaDescription || '',
+    canonicalUrl: page?.canonicalUrl || '',
+    robotsMeta: page?.robotsMeta || 'index',
+    inSitemap: page?.inSitemap !== false,
+    ogImage: page?.ogImage || '',
+    ogTitle: page?.ogTitle || '',
+    ogDescription: page?.ogDescription || ''
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [activeSection, setActiveSection] = useState('content');
+
+  function update(field, value) { setForm((f) => ({ ...f, [field]: value })); }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    if (!form.title.trim() || !form.slug.trim()) {
+      setError('Başlıq və slug tələb olunur.');
+      return;
+    }
+    setSaving(true);
+    const res = await apiRequest(isEdit ? `/api/pages/${page.id}` : '/api/pages', {
+      method: isEdit ? 'PUT' : 'POST',
+      token,
+      body: form
+    });
+    setSaving(false);
+    if (res.success) {
+      addToast(isEdit ? 'Səhifə yeniləndi.' : 'Səhifə əlavə edildi.', 'success');
+      onSaved();
+    } else {
+      setError(res.message || 'Əməliyyat uğursuz oldu.');
+    }
+  }
+
+  const sections = [
+    { id: 'content', label: '📝 Məzmun' },
+    { id: 'seo', label: '🔍 SEO' },
+    { id: 'og', label: '🌐 Open Graph' }
+  ];
+
+  return (
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" style={{ maxWidth: 720 }}>
+        <h3>{isEdit ? 'Səhifəni redaktə et' : 'Yeni səhifə'}</h3>
+        <div className="filter-row" style={{ marginBottom: 20 }}>
+          {sections.map((s) => (
+            <button key={s.id} type="button" className={`filter-chip ${activeSection === s.id ? 'active' : ''}`} onClick={() => setActiveSection(s.id)}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+        {error && <div className="error-banner">{error}</div>}
+        <form onSubmit={handleSubmit}>
+
+          {activeSection === 'content' && (
+            <>
+              <div className="field-row">
+                <div className="field">
+                  <label>Başlıq *</label>
+                  <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Slug *</label>
+                  <input type="text" value={form.slug} placeholder="haqqimizda" onChange={(e) => update('slug', e.target.value)} />
+                </div>
+              </div>
+              <div className="field">
+                <label>Məzmun</label>
+                <textarea value={form.content} onChange={(e) => update('content', e.target.value)} style={{ minHeight: 200 }} />
+              </div>
+              <div className="field">
+                <label>Əsas şəkil URL</label>
+                <input type="text" value={form.featuredImage} placeholder="https://..." onChange={(e) => update('featuredImage', e.target.value)} />
+              </div>
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 16 }}>
+                <div className="checkbox-row">
+                  <input id="page-active" type="checkbox" checked={form.active} onChange={(e) => update('active', e.target.checked)} />
+                  <label htmlFor="page-active">Aktiv (saytda görünsün)</label>
+                </div>
+                <div className="checkbox-row">
+                  <input id="page-menu" type="checkbox" checked={form.showInMenu} onChange={(e) => update('showInMenu', e.target.checked)} />
+                  <label htmlFor="page-menu">Menyuda göstər</label>
+                </div>
+              </div>
+              <div className="field" style={{ maxWidth: 180 }}>
+                <label>Menyu sırası</label>
+                <input type="number" value={form.menuOrder} onChange={(e) => update('menuOrder', parseInt(e.target.value) || 0)} min={0} />
+              </div>
+            </>
+          )}
+
+          {activeSection === 'seo' && (
+            <>
+              <div className="field">
+                <label>SEO Başlığı</label>
+                <input type="text" value={form.metaTitle} placeholder={form.title} onChange={(e) => update('metaTitle', e.target.value)} />
+                <div className="field-hint">{form.metaTitle.length}/60</div>
+              </div>
+              <div className="field">
+                <label>Meta Description</label>
+                <textarea value={form.metaDescription} onChange={(e) => update('metaDescription', e.target.value)} style={{ minHeight: 80 }} />
+                <div className="field-hint">{form.metaDescription.length}/160</div>
+              </div>
+              <div className="field">
+                <label>Canonical URL</label>
+                <input type="text" value={form.canonicalUrl} placeholder={`https://tergit.az/${form.slug}`} onChange={(e) => update('canonicalUrl', e.target.value)} />
+              </div>
+              <div className="field-row">
+                <div className="field">
+                  <label>İndeksləmə</label>
+                  <select value={form.robotsMeta} onChange={(e) => update('robotsMeta', e.target.value)}>
+                    <option value="index">index, follow</option>
+                    <option value="noindex">noindex, nofollow</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Sitemap</label>
+                  <select value={form.inSitemap ? 'yes' : 'no'} onChange={(e) => update('inSitemap', e.target.value === 'yes')}>
+                    <option value="yes">Sitemap-a əlavə et</option>
+                    <option value="no">Sitemap-dan çıxart</option>
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeSection === 'og' && (
+            <>
+              <div className="field">
+                <label>OG Başlıq</label>
+                <input type="text" value={form.ogTitle} placeholder={form.title} onChange={(e) => update('ogTitle', e.target.value)} />
+              </div>
+              <div className="field">
+                <label>OG Açıqlama</label>
+                <textarea value={form.ogDescription} onChange={(e) => update('ogDescription', e.target.value)} style={{ minHeight: 80 }} />
+              </div>
+              <div className="field">
+                <label>OG Şəkil URL</label>
+                <input type="text" value={form.ogImage} placeholder="https://..." onChange={(e) => update('ogImage', e.target.value)} />
+              </div>
+            </>
+          )}
+
+          <div className="row-actions" style={{ marginTop: 24, justifyContent: 'flex-end' }}>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Ləğv et</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? 'Saxlanılır…' : 'Saxla'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function PagesPanel({ token, onAuthError }) {
+  const { addToast } = useToast();
+  const [pages, setPages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [modalState, setModalState] = useState({ open: false, page: null });
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await apiRequest('/api/pages', { token });
+    if (res.authError) { onAuthError(); return; }
+    if (res.success) setPages(res.data);
+    else setError(res.message || 'Səhifələr yüklənə bilmədi.');
+    setLoading(false);
+  }, [token, onAuthError]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  async function handleDelete(page) {
+    if (!window.confirm(`"${page.title}" səhifəsini silmək istədiyinizə əminsiniz?`)) return;
+    const res = await apiRequest(`/api/pages/${page.id}`, { method: 'DELETE', token });
+    if (res.authError) return onAuthError();
+    if (res.success) { addToast('Səhifə silindi.', 'success'); loadData(); }
+    else addToast(res.message || 'Silinmə uğursuz oldu.', 'error');
+  }
+
+  async function handleToggleActive(page) {
+    const res = await apiRequest(`/api/pages/${page.id}`, { method: 'PUT', token, body: { active: !page.active } });
+    if (res.authError) return onAuthError();
+    if (res.success) { addToast(page.active ? 'Səhifə deaktiv edildi.' : 'Səhifə aktiv edildi.', 'success'); loadData(); }
+    else addToast(res.message || 'Əməliyyat uğursuz oldu.', 'error');
+  }
+
+  return (
+    <div>
+      <div className="admin-topbar">
+        <h1>Səhifə İdarəsi</h1>
+        <button className="btn btn-primary" onClick={() => setModalState({ open: true, page: null })}>
+          + Yeni səhifə
+        </button>
+      </div>
+      {error && <div className="error-banner">{error}</div>}
+      <div className="panel">
+        <div className="panel-head">
+          <h3>Bütün səhifələr ({pages.length})</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Başlıq</th>
+              <th>Slug</th>
+              <th>Status</th>
+              <th>Menyu</th>
+              <th>Sıra</th>
+              <th>Əməliyyat</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && <tr className="empty-row"><td colSpan={6}>Yüklənir…</td></tr>}
+            {!loading && pages.length === 0 && <tr className="empty-row"><td colSpan={6}>Hələ səhifə yoxdur.</td></tr>}
+            {!loading && pages.map((p) => (
+              <tr key={p.id}>
+                <td>{p.title}</td>
+                <td><code style={{ fontSize: 12, color: 'var(--muted)' }}>/{p.slug}</code></td>
+                <td>
+                  <span className={`tag-pill ${p.active ? 'pill-success' : 'pill-muted'}`}>
+                    {p.active ? 'Aktiv' : 'Passiv'}
+                  </span>
+                </td>
+                <td>{p.showInMenu ? '✓' : '—'}</td>
+                <td>{p.menuOrder || 0}</td>
+                <td>
+                  <div className="row-actions">
+                    <button className="icon-btn" title={p.active ? 'Deaktiv et' : 'Aktiv et'} onClick={() => handleToggleActive(p)}>
+                      {p.active ? '🙈' : '👁'}
+                    </button>
+                    <button className="icon-btn" title="Redaktə et" onClick={() => setModalState({ open: true, page: p })}>✎</button>
+                    <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {modalState.open && (
+        <PageModal
+          page={modalState.page}
+          token={token}
+          addToast={addToast}
+          onClose={() => setModalState({ open: false, page: null })}
+          onSaved={() => { setModalState({ open: false, page: null }); loadData(); }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
    ADMIN SHELL (sidebar + panel marşrutlaması)
    ============================================================ */
 
@@ -1088,6 +1479,7 @@ const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'posts', label: 'Bloq İdarəsi', icon: '📝' },
   { id: 'categories', label: 'Kateqoriya İdarəsi', icon: '🏷️' },
+  { id: 'pages', label: 'Səhifə İdarəsi', icon: '📄' },
   { id: 'messages', label: 'Mesajlar', icon: '✉️' },
   { id: 'subscribers', label: 'Abunəçilər', icon: '👥' },
   { id: 'seo', label: 'SEO Planner', icon: '🔍' }
@@ -1111,6 +1503,8 @@ function AdminShell({ token, username, onLogout }) {
         return <PostsPanel token={token} onAuthError={handleAuthError} />;
       case 'categories':
         return <CategoriesPanel token={token} onAuthError={handleAuthError} />;
+      case 'pages':
+        return <PagesPanel token={token} onAuthError={handleAuthError} />;
       case 'messages':
         return <MessagesPanel token={token} onAuthError={handleAuthError} />;
       case 'subscribers':
