@@ -1055,7 +1055,60 @@ app.get('/api/pages/:slug', async (req, res) => {
   }
 });
 
-// PUT /api/pages/:id — Səhifəni yenilə (JWT)
+// POST /api/pages — Yeni səhifə yarat (JWT)
+app.post('/api/pages', authenticateToken, async (req, res) => {
+  try {
+    const pages = await readData(FILES.pages);
+    const { title, slug, icon, level, levelLabel, shortDesc, content, tips,
+            heroImage, metaTitle, metaDescription, metaKeywords } = req.body || {};
+
+    if (!title || !slug) return failure(res, 'MISSING_FIELDS', 400, 'Başlıq və slug tələb olunur.');
+
+    const cleanSlug = slugify(slug);
+    if (pages.find((p) => p.slug === cleanSlug)) {
+      return failure(res, 'SLUG_EXISTS', 400, 'Bu slug artıq mövcuddur.');
+    }
+
+    const newPage = {
+      id: generateId('page'),
+      slug: cleanSlug,
+      icon: sanitizeText(icon || '📄'),
+      title: sanitizeText(title),
+      level: ['yuksek', 'orta', 'asagi'].includes(level) ? level : 'orta',
+      levelLabel: sanitizeText(levelLabel || 'ORTA RİSK'),
+      shortDesc: sanitizeText(shortDesc || ''),
+      content: sanitizeText(content || '', { multiline: true }),
+      tips: Array.isArray(tips) ? tips.map((t) => sanitizeText(t)) : [],
+      heroImage: sanitizeText(heroImage || ''),
+      metaTitle: sanitizeText(metaTitle || ''),
+      metaDescription: sanitizeText(metaDescription || ''),
+      metaKeywords: sanitizeText(metaKeywords || ''),
+      updatedAt: new Date().toISOString()
+    };
+
+    pages.push(newPage);
+    await writeData(FILES.pages, pages);
+    return success(res, newPage, 'Səhifə yaradıldı.', 201);
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500);
+  }
+});
+
+// DELETE /api/pages/:id — Səhifəni sil (JWT)
+app.delete('/api/pages/:id', authenticateToken, async (req, res) => {
+  try {
+    const pages = await readData(FILES.pages);
+    const idx = pages.findIndex((p) => p.id === req.params.id);
+    if (idx === -1) return failure(res, 'NOT_FOUND', 404, 'Səhifə tapılmadı.');
+    pages.splice(idx, 1);
+    await writeData(FILES.pages, pages);
+    return success(res, null, 'Səhifə silindi.');
+  } catch (err) {
+    return failure(res, 'SERVER_ERROR', 500);
+  }
+});
+
+
 app.put('/api/pages/:id', authenticateToken, async (req, res) => {
   try {
     const pages = await readData(FILES.pages);
