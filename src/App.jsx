@@ -320,7 +320,7 @@ function Header() {
       <div className="container site-header__inner">
         <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
           <img src="/logo.png" alt="Tergit.az logo" className="brand-logo" />
-          Tergit<span style={{ color: 'var(--accent)' }}>.az</span>
+          <span className="brand-text">Tergit<span className="brand-dot">.az</span></span>
         </Link>
 
         <nav className="nav-links" aria-label="Əsas naviqasiya">
@@ -389,7 +389,7 @@ function Footer() {
           <div style={{ maxWidth: 320 }}>
             <div className="brand" style={{ marginBottom: 14 }}>
               <img src="/logo.png" alt="Tergit.az logo" className="brand-logo" style={{ width: 30, height: 30 }} />
-              Tergit<span style={{ color: 'var(--accent)' }}>.az</span>
+              <span className="brand-text">Tergit<span className="brand-dot">.az</span></span>
             </div>
             <p>Asılılıqlardan azad olmaq üçün məlumat, məsləhət və dəstək platforması.</p>
             <form className="newsletter-form" onSubmit={handleSubscribe}>
@@ -691,7 +691,11 @@ function HomePage() {
                 </div>
               ))}
             </div>
-            <QuizWidget />
+            <div className="home-signs-cta">
+              <h3>Özünü tanı</h3>
+              <p>Bu əlamətlərdən biri sənə tanışdırsa, kömək almaq ən doğru addımdır. Mütəxəssisə müraciət etmək güc əlamətidir.</p>
+              <Link to="/elaqe" className="btn btn-primary" style={{ marginTop: 20 }}>Kömək al →</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -766,7 +770,23 @@ function HomePage() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 40 }}>
+
+          {/* Sosial media */}
+          <div className="home-social" style={{ marginTop: 48 }}>
+            <p className="home-social__label">Bizi izləyin</p>
+            <div className="home-social__links">
+              <a href="https://www.instagram.com/tergit.az" target="_blank" rel="noopener noreferrer" className="home-social-btn home-social-btn--ig">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                <span>@tergit.az</span>
+              </a>
+              <a href="https://www.tiktok.com/@tergit.az" target="_blank" rel="noopener noreferrer" className="home-social-btn home-social-btn--tt">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.26 8.26 0 004.83 1.55V6.79a4.84 4.84 0 01-1.06-.1z"/></svg>
+                <span>@tergit.az</span>
+              </a>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 32 }}>
             <Link to="/elaqe" className="btn btn-primary">Bizə yazın →</Link>
           </div>
         </div>
@@ -1254,48 +1274,153 @@ function ContactPage() {
    ADDICTION DETAIL PAGE
    ============================================================ */
 
+/* ── DİGƏR ASİLILIQLAR KOMPONENTİ ── */
+const PRIORITY_SLUGS = ['siqaret', 'narkotik', 'alkoqol'];
+
+function OtherAddictions({ currentSlug }) {
+  const [showAll, setShowAll] = useState(false);
+  const others = ADDICTIONS.filter((a) => a.id !== currentSlug);
+
+  // Priority sırası: siqaret, narkotik, alkoqol önce, sonra digərləri
+  const sorted = [
+    ...others.filter((a) => PRIORITY_SLUGS.includes(a.id)),
+    ...others.filter((a) => !PRIORITY_SLUGS.includes(a.id))
+  ];
+
+  const visible = showAll ? sorted : sorted.slice(0, 3);
+
+  return (
+    <section className="adp-others-v2">
+      <div className="container">
+        <h3 className="adp-others-v2__title">Digər asılılıq növləri</h3>
+        <div className="adp-others-v2__grid">
+          {visible.map((a) => {
+            const t = PAGE_THEMES[a.id] || DEFAULT_THEME;
+            return (
+              <Link key={a.id} to={`/asililiqlar/${a.id}`} className="adp-full-card">
+                <div className="adp-full-card__hero" style={{ background: t.gradient }}>
+                  <div className="adp-full-card__bg-emoji" aria-hidden="true">
+                    {t.decorEmoji?.[0]}
+                  </div>
+                  <span className="adp-full-card__icon">{a.icon}</span>
+                  <span className="adp-full-card__level" style={{ background: t.badge, color: t.badgeText }}>
+                    {LEVEL_LABELS[a.level]} risk
+                  </span>
+                </div>
+                <div className="adp-full-card__body">
+                  <h4 className="adp-full-card__title">{a.name}</h4>
+                  <p className="adp-full-card__desc">{a.description}</p>
+                  <span className="adp-full-card__link" style={{ color: t.accentDark }}>
+                    Ətraflı oxu →
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+        {!showAll && sorted.length > 3 && (
+          <div style={{ textAlign: 'center', marginTop: 32 }}>
+            <button className="btn btn-ghost" onClick={() => setShowAll(true)}>
+              Bütün asılılıqları gör ({sorted.length - 3} daha)
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 const PAGE_THEMES = {
   'sosial-media': {
     gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
     accent: '#4FC3F7', accentDark: '#0288D1',
     badge: 'rgba(79,195,247,0.15)', badgeText: '#4FC3F7',
-    tipsBg: '#f0f9ff', tipsBorder: '#0288D1'
+    decorEmoji: ['📱', '💬', '❤️', '🔔', '👁'],
+    stats: [
+      { num: '4+ saat', label: 'Ortalama gündəlik ekran vaxtı' },
+      { num: '70%', label: 'Yuxudan əvvəl telefon istifadəsi' },
+      { num: '2.1x', label: 'Artmış narahatlıq riski' }
+    ],
+    quote: 'Hər bildiriş sənin diqqətini çalmaq üçün dizayn edilib.',
+    warnColor: '#FF6B6B'
   },
   'oyun': {
-    gradient: 'linear-gradient(135deg, #0a1628 0%, #1a2f1a 50%, #0d2b0d 100%)',
+    gradient: 'linear-gradient(135deg, #0a1628 0%, #0d2b0d 50%, #1a2f1a 100%)',
     accent: '#69F0AE', accentDark: '#00C853',
     badge: 'rgba(105,240,174,0.15)', badgeText: '#69F0AE',
-    tipsBg: '#f0fdf4', tipsBorder: '#00C853'
+    decorEmoji: ['🎮', '🕹️', '⚔️', '🏆', '🎯'],
+    stats: [
+      { num: '3-4%', label: 'Oyunçularda klinik asılılıq' },
+      { num: '8+ saat', label: 'Ağır asılılıqda gündəlik oyun' },
+      { num: '160M+', label: 'Dünyada risk altındakı oyunçu' }
+    ],
+    quote: 'Level up etmək üçün həyatına qayıt.',
+    warnColor: '#FFD700'
   },
   'siqaret': {
-    gradient: 'linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0a0a 100%)',
-    accent: '#FF8A80', accentDark: '#E53935',
+    gradient: 'linear-gradient(135deg, #1a0000 0%, #3d0000 50%, #1a0a0a 100%)',
+    accent: '#FF8A80', accentDark: '#C62828',
     badge: 'rgba(255,138,128,0.15)', badgeText: '#FF8A80',
-    tipsBg: '#fff5f5', tipsBorder: '#E53935'
+    decorEmoji: ['🚬', '💨', '🫁', '❤️', '⚠️'],
+    stats: [
+      { num: '8M+', label: 'İllik ölüm siqarətə bağlıdır' },
+      { num: '20 san', label: 'Nikotinin beyinə çatma sürəti' },
+      { num: '90%', label: 'Ciyər xərçəngi siqaretdən qaynaqlanır' }
+    ],
+    quote: 'Hər gün tərk etmə günü ola bilər. Bu gün seç.',
+    warnColor: '#FF5252'
   },
   'kofein': {
-    gradient: 'linear-gradient(135deg, #1a1000 0%, #2d1f00 50%, #3d2b00 100%)',
+    gradient: 'linear-gradient(135deg, #1a1000 0%, #3d2800 50%, #2d1f00 100%)',
     accent: '#FFCC80', accentDark: '#E65100',
     badge: 'rgba(255,204,128,0.15)', badgeText: '#FFCC80',
-    tipsBg: '#fffbf0', tipsBorder: '#E65100'
+    decorEmoji: ['☕', '🫖', '💊', '⚡', '😴'],
+    stats: [
+      { num: '400mg', label: 'Gündəlik təhlükəsiz limit' },
+      { num: '2 gün', label: 'Geri çəkilmə müddəti' },
+      { num: '90%', label: 'Yetkinlər gündəlik kofein istifadə edir' }
+    ],
+    quote: 'Enerji içkilərdən deyil, həyat tərzihdən gəlir.',
+    warnColor: '#FFA000'
   },
   'fast-food': {
-    gradient: 'linear-gradient(135deg, #1a0d00 0%, #2d1500 50%, #3d2000 100%)',
-    accent: '#FFD54F', accentDark: '#F57F17',
+    gradient: 'linear-gradient(135deg, #1a0d00 0%, #3d1a00 50%, #2d1500 100%)',
+    accent: '#FFD54F', accentDark: '#E65100',
     badge: 'rgba(255,213,79,0.15)', badgeText: '#FFD54F',
-    tipsBg: '#fffdf0', tipsBorder: '#F57F17'
+    decorEmoji: ['🍔', '🍟', '🥤', '🍕', '⚠️'],
+    stats: [
+      { num: '1.9Mlrd', label: 'Dünyada artıq çəkili insan' },
+      { num: '39%', label: 'Yetkinlərdə obezitenin payı' },
+      { num: '2x', label: 'Fast food istehlakçılarında diabet riski' }
+    ],
+    quote: 'Bədəninə verdiyin yanacaq gələcəyini şəkillendirir.',
+    warnColor: '#FF6D00'
   },
   'alkoqol': {
-    gradient: 'linear-gradient(135deg, #1a0010 0%, #2d001e 50%, #1a0028 100%)',
-    accent: '#CE93D8', accentDark: '#7B1FA2',
+    gradient: 'linear-gradient(135deg, #1a0010 0%, #2d0028 50%, #1a0028 100%)',
+    accent: '#CE93D8', accentDark: '#6A1B9A',
     badge: 'rgba(206,147,216,0.15)', badgeText: '#CE93D8',
-    tipsBg: '#fdf0ff', tipsBorder: '#7B1FA2'
+    decorEmoji: ['🍷', '🥃', '🫀', '🧠', '⚠️'],
+    stats: [
+      { num: '3M', label: 'İllik alkoqol bağlantılı ölüm' },
+      { num: '5%', label: 'Dünya xəstəlik yükünün payı' },
+      { num: '200+', label: 'Alkoqolun bağlantılı olduğu xəstəlik' }
+    ],
+    quote: 'Kömək istəmək zəiflik deyil, ən böyük gücdür.',
+    warnColor: '#E040FB'
   },
   'narkotik': {
-    gradient: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)',
+    gradient: 'linear-gradient(135deg, #050505 0%, #0f0f1a 50%, #0a0a14 100%)',
     accent: '#80CBC4', accentDark: '#00695C',
     badge: 'rgba(128,203,196,0.15)', badgeText: '#80CBC4',
-    tipsBg: '#f0fffe', tipsBorder: '#00695C'
+    decorEmoji: ['💊', '🧪', '🫀', '🆘', '☎️'],
+    stats: [
+      { num: '500K+', label: 'İllik narkotik bağlantılı ölüm' },
+      { num: '35M', label: 'Dünyada narkotik istifadə pozuntusu' },
+      { num: '1/7', label: 'Asılı insanların müalicəyə çıxışı' }
+    ],
+    quote: 'Sağalma mümkündür. Hər gün yeni bir başlanğıcdır.',
+    warnColor: '#F44336'
   }
 };
 
@@ -1303,7 +1428,137 @@ const DEFAULT_THEME = {
   gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
   accent: '#76B852', accentDark: '#4a8f2a',
   badge: 'rgba(118,184,82,0.15)', badgeText: '#76B852',
-  tipsBg: '#f0f9f4', tipsBorder: '#4a8f2a'
+  decorEmoji: ['🔗', '💪', '🌱', '✨', '❤️'],
+  stats: [], quote: '', warnColor: '#4a8f2a'
+};
+
+const ADDICTION_CONTENT = {
+  'sosial-media': {
+    symptoms: [
+      { icon: '😰', title: 'Bildiriş yoxlaması', desc: 'Hər 2-3 dəqiqədən bir telefonu yoxlamaq' },
+      { icon: '😴', title: 'Yuxu pozulması', desc: 'Gecə yarısına qədər skrol etmək' },
+      { icon: '😟', title: 'FOMO', desc: 'Bir şeyi qaçırmaq qorxusu' },
+      { icon: '😔', title: 'Özünə hörmət', desc: 'Başqaları ilə müqayisə nəticəsində düşgünlük' },
+      { icon: '😤', title: 'Emosional reaktivlik', desc: 'Bəyənmə az gəldikdə əsəbilik' },
+      { icon: '🚫', title: 'Real həyatdan qaçış', desc: 'Real münasibətlərin zəifləməsi' }
+    ],
+    timeline: [
+      { time: '1-2 saat/gün', label: 'Normal istifadə', color: '#4CAF50' },
+      { time: '2-4 saat/gün', label: 'Artan istifadə', color: '#FF9800' },
+      { time: '4-6 saat/gün', label: 'Risk zonası', color: '#FF5722' },
+      { time: '6+ saat/gün', label: 'Asılılıq', color: '#F44336' }
+    ],
+    didYouKnow: 'İnstagram "bəyənmə" funksiyası beynimizdə qumar oyunları ilə eyni neyron sistemini aktivləşdirir.',
+    helpSteps: ['Digital detox — 24 saatlıq telefonsuz gün', 'Ekran vaxtı tətbiqini quraşdır', 'Bildirişləri söndür', 'Telefonsuz yataq otağı qaydası qoy', 'Sosial mediaya alternativ hobbi tap']
+  },
+  'oyun': {
+    symptoms: [
+      { icon: '🕐', title: 'Vaxt itirilməsi', desc: 'Oyun oynayarkən saatların necə keçdiyini hiss etməmək' },
+      { icon: '😡', title: 'Kəsintiyə reaksiya', desc: 'Oyundan ayrılmaq məcburiyyəti qalanda güclü əsəbilik' },
+      { icon: '🌙', title: 'Yuxudan imtina', desc: 'Gecə oyun oynamaq üçün yuxudan imtina etmək' },
+      { icon: '🍽️', title: 'Yeməyi unutmaq', desc: 'Ac qalmağa baxmayaraq oyunu davam etdirmək' },
+      { icon: '👥', title: 'Sosial təcrid', desc: 'Dostlardan və ailədon uzaqlaşmaq' },
+      { icon: '📚', title: 'Vəzifə ihmali', desc: 'Məktəb, iş, digər məsuliyyətləri unutmaq' }
+    ],
+    timeline: [
+      { time: '1-2 saat/gün', label: 'Sağlam oyun', color: '#4CAF50' },
+      { time: '2-4 saat/gün', label: 'Diqqət tələb edir', color: '#FF9800' },
+      { time: '4-8 saat/gün', label: 'Yüksək risk', color: '#FF5722' },
+      { time: '8+ saat/gün', label: 'Klinik asılılıq', color: '#F44336' }
+    ],
+    didYouKnow: 'Dünya Səhiyyə Təşkilatı (WHO) 2018-ci ildə "Oyun Pozuntusunu" rəsmi xəstəlik kimi tanıdı.',
+    helpSteps: ['Gündəlik oyun vaxtı limiti qoy (1-2 saat)', 'Yatmazdan 1 saat əvvəl oyunu bağla', 'Real idman ilə əvəz et', 'Oyun olmayan dostlarla vaxt keçir', 'Psixoloq yardımı al']
+  },
+  'siqaret': {
+    symptoms: [
+      { icon: '🤢', title: 'Geri çəkilmə', desc: 'Siqaret çəkmədikdə narahatçılıq, baş ağrısı' },
+      { icon: '🧠', title: 'Obsessiv düşüncə', desc: 'Hər zaman növbəti siqaret haqqında düşünmək' },
+      { icon: '😰', title: 'Stres cavabı', desc: 'Hər stresli anda ilk reaksiya siqaret çəkmək' },
+      { icon: '💸', title: 'Mali ziyan', desc: 'Siqaretə xərclərin artması' },
+      { icon: '🏃', title: 'Nəfəs çatışmazlığı', desc: 'Fiziki fəaliyyət zamanı güclü nəfəs çatışmazlığı' },
+      { icon: '🌅', title: 'Səhər növbəti', desc: 'Oyandıqda ilk iş siqaret çəkmək' }
+    ],
+    timeline: [
+      { time: 'Bəzən', label: 'Sosial siqaret', color: '#FF9800' },
+      { time: 'Gündə 1-5', label: 'Başlangıc', color: '#FF5722' },
+      { time: 'Gündə 5-15', label: 'Asılılıq', color: '#F44336' },
+      { time: 'Gündə 15+', label: 'Ağır asılılıq', color: '#B71C1C' }
+    ],
+    didYouKnow: 'Siqareti tərk etdikdən 20 dəqiqə sonra qan təzyiqi normallaşmağa başlayır. 10 ildə ciyər xərçəngi riski 50% azalır.',
+    helpSteps: ['Tərk etmə tarixini əvvəlcədən müəyyən et', 'Nikotin əvəzedicilərindən istifadə et', 'Həkimdən dərman müalicəsi soruş', 'Siqaret tetikleyicilərini müəyyən et', 'Dəstək qrupuna qoşul']
+  },
+  'kofein': {
+    symptoms: [
+      { icon: '🤕', title: 'Baş ağrısı', desc: 'Kofeinsiz 12-24 saatda güclü baş ağrısı' },
+      { icon: '😩', title: 'Yorğunluq', desc: 'Kofeinsiz ekstrem yorğunluq hissi' },
+      { icon: '😠', title: 'Əhval pozulması', desc: 'Qəhvəsiz günlərdə əsəbilik' },
+      { icon: '🎯', title: 'Konsantrasiya', desc: 'Kofeinsiz diqqəti toplamaq çətinliyi' },
+      { icon: '💊', title: 'Dözümlülük', desc: 'Eyni effekt üçün getdikcə daha çox kofein lazım' },
+      { icon: '😤', title: 'İmtinaya müqavimət', desc: 'Azaltmaq istəsən belə dayandıra bilməmək' }
+    ],
+    timeline: [
+      { time: 'Gündə 1-2 kasa', label: 'Mötədil', color: '#4CAF50' },
+      { time: '2-4 kasa', label: 'Yüksək', color: '#FF9800' },
+      { time: '4-6 kasa', label: 'Həddindən artıq', color: '#FF5722' },
+      { time: '6+ kasa', label: 'Asılılıq zonası', color: '#F44336' }
+    ],
+    didYouKnow: 'Kofein dünyanın ən çox istifadə edilən psixoaktiv maddəsidir. 400mg gündəlik limit (4 kasa qəhvə) sağlam sayılır.',
+    helpSteps: ['Qəfil deyil, tədricən azalt', 'Saat 14-dən sonra kofein qəbul etmə', 'Su qəbulunu artır', 'Yuxu keyfiyyətinə diqqət et', 'Enerji üçün qısa gəzintidən istifadə et']
+  },
+  'fast-food': {
+    symptoms: [
+      { icon: '🍟', title: 'Cravings', desc: 'Yedikdən dərhal sonra yenidən yeməyə can atmaq' },
+      { icon: '😔', title: 'Emosional yemək', desc: 'Kədər, stres hisslərini yeməklə basmaq' },
+      { icon: '🚫', title: 'Nəzarətsizlik', desc: 'Dayandırmaq istəsən belə dayandıra bilməmək' },
+      { icon: '🙈', title: 'Gizli yemək', desc: 'Başqalarından gizlin yemək' },
+      { icon: '🔄', title: 'Pişmanlıq dövrü', desc: 'Yemək → pişmanlıq → yenidən yemək dövrü' },
+      { icon: '⚡', title: 'Enerji düşgünlüyü', desc: 'Yedikdən sonra ağırlıq, yorğunluq' }
+    ],
+    timeline: [
+      { time: 'Həftədə 1-2', label: 'Mötədil', color: '#4CAF50' },
+      { time: 'Həftədə 3-4', label: 'Diqqət et', color: '#FF9800' },
+      { time: 'Gündə 1', label: 'Yüksək risk', color: '#FF5722' },
+      { time: 'Gündə 2+', label: 'Asılılıq', color: '#F44336' }
+    ],
+    didYouKnow: 'Fast food şirkətləri yeməklərin "bliss point"ini — şəkər, yağ, duzun beyin üçün ən cəlbedici kombinasiyasını — elmi yolla hesablayır.',
+    helpSteps: ['Evdə hazır sağlam yeməklər saxla', 'Aclıq hiss etdikdə fast food-a getmə', 'Hissə ölçüsünü azalt', 'Emosional yemə tetikleyicilərini tanı', 'Dietoloq yardımı al']
+  },
+  'alkoqol': {
+    symptoms: [
+      { icon: '🕐', title: 'Gündəlik içmə', desc: 'Hər gün içmək ehtiyacı hissi' },
+      { icon: '🤫', title: 'Gizlin içmə', desc: 'Ailədən gizlin içmək' },
+      { icon: '😰', title: 'Titrəmə', desc: 'Alkoqolsuz əllərdə titrəmə, tər basmaq' },
+      { icon: '🛑', title: 'Dayandırma cəhdləri', desc: 'Dəfələrlə "bu son dəfədir" demək' },
+      { icon: '💼', title: 'İş problemləri', desc: 'İçki səbəbindən iş, münasibət problemləri' },
+      { icon: '🧠', title: 'Yaddaş boşluqları', desc: 'İçdikdən sonra nə etdiyini xatırlamamaq' }
+    ],
+    timeline: [
+      { time: 'Həftədə 1-2', label: 'Mötədil', color: '#4CAF50' },
+      { time: 'Həftədə 3-5', label: 'Riskli içmə', color: '#FF9800' },
+      { time: 'Gündə 1-2 qədeh', label: 'Problem içmə', color: '#FF5722' },
+      { time: 'Gündə 3+', label: 'Alkoqolizm', color: '#F44336' }
+    ],
+    didYouKnow: 'Alkoqol fiziki asılılığı yaranmış insanlar üçün qəfil dayandırmaq həyati təhlükəlidir. Mütləq tibbi nəzarət altında edilməlidir.',
+    helpSteps: ['Mütəxəssisə müraciət et (ani dayandırma təhlükəlidir)', 'Anonim Alkoqollar (AA) qrupuna qoşul', 'Ailəni prosesə cəlb et', 'Tetikleyicilərdən uzaq qal', 'Uzunmüddətli psixoterapiya al']
+  },
+  'narkotik': {
+    symptoms: [
+      { icon: '💉', title: 'Dozanı artırma', desc: 'Eyni effekt üçün getdikcə daha çox doza lazım' },
+      { icon: '🌑', title: 'Həyatın daralması', desc: 'Narkotikdən başqa heç nəyin əhəmiyyəti qalmamaq' },
+      { icon: '🤒', title: 'Geri çəkilmə', desc: 'İstifadə olmadanda ağır fiziki simptomlar' },
+      { icon: '💸', title: 'Mali dağınıqlıq', desc: 'Hər şeyi doza üçün xərcləmək' },
+      { icon: '👤', title: 'İzolasiya', desc: 'Sevdiklərindən tam uzaqlaşmaq' },
+      { icon: '⚠️', title: 'Qanuna zidd davranış', desc: 'Doza üçün qanun xaricindəki yollara əl atmaq' }
+    ],
+    timeline: [
+      { time: 'İlk dəfə', label: 'Sınamaq', color: '#FF9800' },
+      { time: 'Bəzən', label: 'Eksperimental', color: '#FF5722' },
+      { time: 'Müntəzəm', label: 'Asılılıq inkişafı', color: '#F44336' },
+      { time: 'Gündəlik', label: 'Ağır asılılıq', color: '#B71C1C' }
+    ],
+    didYouKnow: 'Narkotik asılılığı xroniki beyin xəstəliyidir — zəiflik deyil. Sağalma mümkündür və müalicə effektlidir.',
+    helpSteps: ['Dərhal professional yardım al — 152 zəng et', 'Tibbi detoks proqramına müraciət et', 'Ailənə danış', 'Rehabilitasiya mərkəzini araşdır', 'Daimi psixoloji müşayiət al']
+  }
 };
 
 function AddictionDetailPage() {
@@ -1311,6 +1566,7 @@ function AddictionDetailPage() {
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [openSymptom, setOpenSymptom] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -1320,28 +1576,27 @@ function AddictionDetailPage() {
         const res = await fetch(`/api/pages/${slug}`);
         const json = await res.json();
         if (!active) return;
-        if (json.success) {
-          setPage(json.data);
-        } else {
-          setNotFound(true);
-        }
-      } catch {
-        if (active) setNotFound(true);
-      }
+        if (json.success) setPage(json.data);
+        else setNotFound(true);
+      } catch { if (active) setNotFound(true); }
       setLoading(false);
     }
     load();
     return () => { active = false; };
   }, [slug]);
 
-  if (loading) return <div className="container" style={{ padding: '120px 24px', textAlign: 'center' }}>Yüklənir…</div>;
+  if (loading) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: 'var(--muted)' }}>
+      Yüklənir…
+    </div>
+  );
   if (notFound || !page) return <NotFoundPage />;
 
   const theme = PAGE_THEMES[page.slug] || DEFAULT_THEME;
+  const extra = ADDICTION_CONTENT[page.slug] || {};
 
   const articleJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@context': 'https://schema.org', '@type': 'Article',
     headline: page.title,
     description: page.metaDescription || page.shortDesc,
     url: `${SITE_URL}/asililiqlar/${page.slug}`,
@@ -1349,7 +1604,7 @@ function AddictionDetailPage() {
   };
 
   return (
-    <div className="page-enter">
+    <div className="page-enter adp">
       <SEO
         title={page.metaTitle || page.title}
         description={page.metaDescription || page.shortDesc}
@@ -1358,82 +1613,160 @@ function AddictionDetailPage() {
         jsonLd={articleJsonLd}
       />
 
-      {/* THEMED HERO */}
-      <section className="addiction-detail-hero" style={{ background: theme.gradient }}>
-        <div className="container">
-          <Link to="/asililiqlar" className="addiction-detail-back" style={{ color: theme.accent }}>
-            ← Bütün asılılıqlar
-          </Link>
-          <div className="addiction-detail-hero__inner">
-            <div>
-              <span className="addiction-detail-level-badge" style={{ background: theme.badge, color: theme.badgeText }}>
-                {page.levelLabel}
-              </span>
-              <h1 className="addiction-detail-hero__title" style={{ color: '#FFFFFF' }}>
-                <span className="addiction-detail-hero__icon">{page.icon}</span>
-                {page.title}
-              </h1>
-              <p className="addiction-detail-hero__sub" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                {page.shortDesc}
-              </p>
-              <Link to="/elaqe" className="addiction-detail-cta" style={{ background: theme.accent, color: '#1a1a1a' }}>
-                Kömək al →
-              </Link>
-            </div>
-            <div className="addiction-detail-hero__emoji-wrap" style={{ borderColor: theme.accent }}>
-              {page.heroImage
-                ? <img src={page.heroImage} alt={page.title} className="addiction-detail-hero__img" />
-                : <span className="addiction-detail-hero__big-icon">{page.icon}</span>
-              }
-            </div>
-          </div>
+      {/* ══ HERO ══ */}
+      <section className="adp-hero" style={{ background: theme.gradient }}>
+        <div className="adp-hero__bg-emojis" aria-hidden="true">
+          {theme.decorEmoji.map((e, i) => (
+            <span key={i} className={`adp-bg-emoji adp-bg-emoji--${i}`}>{e}</span>
+          ))}
         </div>
-      </section>
-
-      {/* MƏZMUN + TÖVSİYƏLƏR */}
-      <section className="section">
-        <div className="container addiction-detail-layout">
-          <div className="addiction-detail-content">
-            <h2 style={{ color: theme.accentDark }}>Asılılıq haqqında</h2>
-            {page.content.split('\n\n').map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
-          </div>
-
-          {page.tips && page.tips.length > 0 && (
-            <div className="addiction-detail-tips" style={{ background: theme.tipsBg, borderColor: theme.tipsBorder }}>
-              <h3 style={{ color: theme.accentDark }}>✅ Praktiki tövsiyələr</h3>
-              <ol className="addiction-detail-tips__list">
-                {page.tips.map((tip, i) => (
-                  <li key={i} style={{ borderLeft: `3px solid ${theme.accentDark}` }}>{tip}</li>
-                ))}
-              </ol>
-              <Link to="/elaqe" className="btn btn-primary" style={{ marginTop: 24, display: 'inline-flex', background: theme.accentDark, boxShadow: 'none' }}>
-                Mütəxəssislə əlaqə →
+        <div className="container adp-hero__inner">
+          <div className="adp-hero__text">
+            <Link to="/asililiqlar" className="adp-back" style={{ color: theme.accent }}>
+              ← Bütün asılılıqlar
+            </Link>
+            <div className="adp-hero__tag" style={{ background: theme.badge, color: theme.badgeText }}>
+              {page.levelLabel || 'Asılılıq'}
+            </div>
+            <h1 className="adp-hero__title">
+              <span className="adp-hero__emoji">{page.icon}</span>
+              {page.title}
+            </h1>
+            <p className="adp-hero__desc">{page.shortDesc}</p>
+            {theme.quote && (
+              <div className="adp-hero__quote" style={{ borderColor: theme.accent }}>
+                <span className="adp-hero__quote-mark" style={{ color: theme.accent }}>"</span>
+                {theme.quote}
+              </div>
+            )}
+            <div className="adp-hero__btns">
+              <Link to="/elaqe" className="adp-btn-primary" style={{ background: theme.accent }}>
+                🆘 Kömək al
               </Link>
+              <a href="#signs" className="adp-btn-ghost" style={{ borderColor: theme.accent, color: theme.accent }}>
+                Əlamətlər →
+              </a>
+            </div>
+          </div>
+          {theme.stats && theme.stats.length > 0 && (
+            <div className="adp-hero__stats">
+              {theme.stats.map((s, i) => (
+                <div key={i} className="adp-stat" style={{ borderTopColor: theme.accent }}>
+                  <div className="adp-stat__num" style={{ color: theme.accent }}>{s.num}</div>
+                  <div className="adp-stat__txt">{s.label}</div>
+                </div>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* DİGƏR ASILILIQLAR */}
-      <section className="section" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', padding: '50px 0' }}>
-        <div className="container">
-          <h3 style={{ marginBottom: 24, color: 'var(--text-dark)' }}>Digər asılılıqlar</h3>
-          <div className="addiction-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))' }}>
-            {ADDICTIONS.filter((a) => a.id !== slug).map((a) => {
-              const t = PAGE_THEMES[a.id] || DEFAULT_THEME;
-              return (
-                <Link key={a.id} to={`/asililiqlar/${a.id}`} className="addiction-mini-card" style={{ borderTop: `3px solid ${t.accentDark}` }}>
-                  <span style={{ fontSize: 32 }}>{a.icon}</span>
-                  <span style={{ fontWeight: 600, color: 'var(--text-dark)' }}>{a.name}</span>
-                  <span style={{ fontSize: 11, color: t.accentDark }}>{LEVEL_LABELS[a.level]} risk</span>
-                </Link>
-              );
-            })}
+      {/* ══ "BİLİRDİNMİ?" ══ */}
+      {extra.didYouKnow && (
+        <div className="adp-dyk" style={{ background: theme.accentDark }}>
+          <div className="container adp-dyk__inner">
+            <span className="adp-dyk__icon">💡</span>
+            <p><strong>Bilirdinmi?</strong> {extra.didYouKnow}</p>
           </div>
         </div>
+      )}
+
+      {/* ══ ƏLAMƏTLƏr ══ */}
+      {extra.symptoms && extra.symptoms.length > 0 && (
+        <section id="signs" className="adp-section">
+          <div className="container">
+            <div className="adp-section__head">
+              <div className="adp-section__tag" style={{ color: theme.accentDark, background: `${theme.accentDark}12` }}>Əlamətlər</div>
+              <h2 className="adp-section__title">Asılılığın əlamətlərini tanı</h2>
+              <p className="adp-section__sub">Bunlardan biri sənə tanışdırsa, kömək almağı düşün.</p>
+            </div>
+            <div className="adp-symptoms-grid">
+              {extra.symptoms.map((s, i) => (
+                <div key={i}
+                  className={`adp-symptom-card${openSymptom === i ? ' open' : ''}`}
+                  onClick={() => setOpenSymptom(openSymptom === i ? null : i)}
+                  style={{ borderTopColor: theme.accentDark }}>
+                  <div className="adp-symptom-card__top">
+                    <span className="adp-symptom-icon">{s.icon}</span>
+                    <span className="adp-symptom-title">{s.title}</span>
+                    <span className="adp-symptom-arrow" style={{ color: theme.accentDark }}>{openSymptom === i ? '▲' : '▼'}</span>
+                  </div>
+                  {openSymptom === i && (
+                    <div className="adp-symptom-desc" style={{ borderTopColor: `${theme.accentDark}30` }}>{s.desc}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══ RİSK TİMELINE ══ */}
+      {extra.timeline && extra.timeline.length > 0 && (
+        <section className="adp-section adp-section--gray">
+          <div className="container">
+            <div className="adp-section__head">
+              <div className="adp-section__tag" style={{ color: theme.accentDark, background: `${theme.accentDark}12` }}>Risk səviyyələri</div>
+              <h2 className="adp-section__title">Sən hansı mərhələdəsən?</h2>
+            </div>
+            <div className="adp-timeline">
+              {extra.timeline.map((t, i) => (
+                <div key={i} className="adp-tl-item">
+                  <div className="adp-tl-dot" style={{ background: t.color, boxShadow: `0 0 12px ${t.color}60` }} />
+                  <div className="adp-tl-content">
+                    <div className="adp-tl-bar" style={{ background: t.color }} />
+                    <div className="adp-tl-time">{t.time}</div>
+                    <div className="adp-tl-label" style={{ color: t.color }}>{t.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══ MƏZMUN + TÖVSİYƏLƏR ══ */}
+      <section className="adp-section">
+        <div className="container adp-content-layout">
+          <div className="adp-main-content">
+            <div className="adp-section__tag" style={{ color: theme.accentDark, background: `${theme.accentDark}12` }}>Ətraflı məlumat</div>
+            <h2 className="adp-section__title" style={{ marginBottom: 24 }}>{page.title} haqqında</h2>
+            {page.content.split('\n\n').filter(Boolean).map((para, i) => (
+              <p key={i} className="adp-para">{para}</p>
+            ))}
+          </div>
+          <aside className="adp-aside">
+            {(page.tips && page.tips.length > 0 || extra.helpSteps) && (
+              <div className="adp-tips-card" style={{ borderTopColor: theme.accentDark }}>
+                <div className="adp-tips-card__head" style={{ background: `${theme.accentDark}10` }}>
+                  <span style={{ fontSize: 20 }}>✅</span>
+                  <h3 style={{ color: theme.accentDark }}>Nə edə bilərəm?</h3>
+                </div>
+                <ol className="adp-tips-list">
+                  {(page.tips && page.tips.length > 0 ? page.tips : (extra.helpSteps || [])).map((tip, i) => (
+                    <li key={i}>
+                      <span className="adp-tips-num" style={{ background: theme.accentDark }}>{i + 1}</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ol>
+                <Link to="/elaqe" className="adp-tips-cta" style={{ background: theme.accentDark }}>
+                  Mütəxəssislə əlaqə →
+                </Link>
+              </div>
+            )}
+            <div className="adp-help-card" style={{ borderColor: theme.warnColor }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>🆘</div>
+              <strong style={{ color: theme.warnColor, display: 'block', marginBottom: 8 }}>Kömək lazımdır?</strong>
+              <p>Özün üçün ya da yaxınınız üçün professional yardım alın.</p>
+              <a href="tel:152" className="adp-help-tel" style={{ background: theme.warnColor }}>📞 152 — Pulsuz Yardım</a>
+            </div>
+          </aside>
+        </div>
       </section>
+
+      {/* ══ DİGƏR ASİLILIQLAR ══ */}
+      <OtherAddictions currentSlug={slug} />
     </div>
   );
 }
