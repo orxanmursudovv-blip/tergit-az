@@ -758,14 +758,23 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const metaTitle = sanitizeText(req.body?.metaTitle) || title;
     const metaDescription = sanitizeText(req.body?.metaDescription, { multiline: true });
     const metaKeywords = sanitizeText(req.body?.metaKeywords);
-    const ogImage = sanitizeText(req.body?.ogImage);
+    const focusKeyword = sanitizeText(req.body?.focusKeyword);
+    const canonicalUrl = sanitizeText(req.body?.canonicalUrl);
+    const featuredImage = sanitizeText(req.body?.featuredImage);
+    const imageAlt = sanitizeText(req.body?.imageAlt);
+    const useOgFromFeatured = req.body?.useOgFromFeatured !== false;
+    const ogImage = useOgFromFeatured ? featuredImage : sanitizeText(req.body?.ogImage);
     const published = Boolean(req.body?.published);
+    const noIndex = Boolean(req.body?.noIndex);
+    const inSitemap = req.body?.inSitemap !== false;
+    const faq = Array.isArray(req.body?.faq) ? req.body.faq.map((f) => ({
+      question: sanitizeText(f.question || ''),
+      answer: sanitizeText(f.answer || '', { multiline: true }),
+      show: Boolean(f.show)
+    })) : [];
 
     if (!title || !content || !categoryId) {
       return failure(res, 'MISSING_FIELDS', 400, 'Başlıq, məzmun və kateqoriya tələb olunur.');
-    }
-    if (ogImage && !validator.isURL(ogImage, { require_protocol: true })) {
-      return failure(res, 'INVALID_URL', 400, 'OG şəkil URL düzgün formatda olmalıdır.');
     }
 
     const categories = await readData(FILES.categories);
@@ -786,18 +795,12 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const now = new Date().toISOString();
     const newPost = {
       id: generateId('post'),
-      title,
-      slug,
-      categoryId,
-      content,
-      metaTitle,
-      metaDescription,
-      metaKeywords,
-      ogImage,
-      published,
-      createdAt: now,
-      updatedAt: now,
-      views: 0
+      title, slug, categoryId, content,
+      featuredImage, imageAlt, useOgFromFeatured, ogImage,
+      metaTitle, metaDescription, metaKeywords,
+      focusKeyword, canonicalUrl, noIndex, inSitemap,
+      faq, published,
+      createdAt: now, updatedAt: now, views: 0
     };
 
     posts.push(newPost);
@@ -814,35 +817,40 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
   try {
     const posts = await readData(FILES.posts);
     const index = posts.findIndex((p) => p.id === req.params.id);
-    if (index === -1) {
-      return failure(res, 'NOT_FOUND', 404, 'Məqalə tapılmadı.');
-    }
+    if (index === -1) return failure(res, 'NOT_FOUND', 404, 'Məqalə tapılmadı.');
 
     const existing = posts[index];
-    const title = req.body?.title !== undefined ? sanitizeText(req.body.title) : existing.title;
-    const content = req.body?.content !== undefined ? sanitizeText(req.body.content, { multiline: true }) : existing.content;
-    const categoryId = req.body?.categoryId !== undefined ? sanitizeText(req.body.categoryId) : existing.categoryId;
-    let slug = req.body?.slug !== undefined ? slugify(sanitizeText(req.body.slug)) : existing.slug;
-    const metaTitle = req.body?.metaTitle !== undefined ? sanitizeText(req.body.metaTitle) : existing.metaTitle;
-    const metaDescription = req.body?.metaDescription !== undefined ? sanitizeText(req.body.metaDescription, { multiline: true }) : existing.metaDescription;
-    const metaKeywords = req.body?.metaKeywords !== undefined ? sanitizeText(req.body.metaKeywords) : existing.metaKeywords;
-    const ogImage = req.body?.ogImage !== undefined ? sanitizeText(req.body.ogImage) : existing.ogImage;
-    const published = req.body?.published !== undefined ? Boolean(req.body.published) : existing.published;
+    const b = req.body || {};
+
+    const title = b.title !== undefined ? sanitizeText(b.title) : existing.title;
+    const content = b.content !== undefined ? sanitizeText(b.content, { multiline: true }) : existing.content;
+    const categoryId = b.categoryId !== undefined ? sanitizeText(b.categoryId) : existing.categoryId;
+    let slug = b.slug !== undefined ? slugify(sanitizeText(b.slug)) : existing.slug;
+    const metaTitle = b.metaTitle !== undefined ? sanitizeText(b.metaTitle) : existing.metaTitle;
+    const metaDescription = b.metaDescription !== undefined ? sanitizeText(b.metaDescription, { multiline: true }) : existing.metaDescription;
+    const metaKeywords = b.metaKeywords !== undefined ? sanitizeText(b.metaKeywords) : existing.metaKeywords;
+    const focusKeyword = b.focusKeyword !== undefined ? sanitizeText(b.focusKeyword) : existing.focusKeyword;
+    const canonicalUrl = b.canonicalUrl !== undefined ? sanitizeText(b.canonicalUrl) : existing.canonicalUrl;
+    const featuredImage = b.featuredImage !== undefined ? sanitizeText(b.featuredImage) : existing.featuredImage;
+    const imageAlt = b.imageAlt !== undefined ? sanitizeText(b.imageAlt) : existing.imageAlt;
+    const useOgFromFeatured = b.useOgFromFeatured !== undefined ? Boolean(b.useOgFromFeatured) : existing.useOgFromFeatured;
+    const ogImage = useOgFromFeatured ? featuredImage : (b.ogImage !== undefined ? sanitizeText(b.ogImage) : existing.ogImage);
+    const published = b.published !== undefined ? Boolean(b.published) : existing.published;
+    const noIndex = b.noIndex !== undefined ? Boolean(b.noIndex) : existing.noIndex;
+    const inSitemap = b.inSitemap !== undefined ? Boolean(b.inSitemap) : existing.inSitemap;
+    const faq = Array.isArray(b.faq) ? b.faq.map((f) => ({
+      question: sanitizeText(f.question || ''),
+      answer: sanitizeText(f.answer || '', { multiline: true }),
+      show: Boolean(f.show)
+    })) : (existing.faq || []);
 
     if (!title || !content || !categoryId) {
       return failure(res, 'MISSING_FIELDS', 400, 'Başlıq, məzmun və kateqoriya tələb olunur.');
     }
-    if (ogImage && !validator.isURL(ogImage, { require_protocol: true })) {
-      return failure(res, 'INVALID_URL', 400, 'OG şəkil URL düzgün formatda olmalıdır.');
-    }
-    if (!slug) {
-      return failure(res, 'INVALID_SLUG', 400, 'Slug boş ola bilməz.');
-    }
+    if (!slug) return failure(res, 'INVALID_SLUG', 400, 'Slug boş ola bilməz.');
 
     const slugConflict = posts.find((p) => p.slug === slug && p.id !== existing.id);
-    if (slugConflict) {
-      return failure(res, 'DUPLICATE_SLUG', 409, 'Bu slug artıq istifadə olunur.');
-    }
+    if (slugConflict) return failure(res, 'DUPLICATE_SLUG', 409, 'Bu slug artıq istifadə olunur.');
 
     const categories = await readData(FILES.categories);
     if (!categories.find((c) => c.id === categoryId)) {
@@ -851,15 +859,11 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
 
     posts[index] = {
       ...existing,
-      title,
-      content,
-      categoryId,
-      slug,
-      metaTitle,
-      metaDescription,
-      metaKeywords,
-      ogImage,
-      published,
+      title, content, categoryId, slug,
+      featuredImage, imageAlt, useOgFromFeatured, ogImage,
+      metaTitle, metaDescription, metaKeywords,
+      focusKeyword, canonicalUrl, noIndex, inSitemap,
+      faq, published,
       updatedAt: new Date().toISOString()
     };
 
@@ -925,7 +929,25 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
 app.get('/sitemap.xml', async (req, res) => {
   try {
     const posts = await readData(FILES.posts);
-    const publishedPosts = posts.filter((p) => p.published);
+    const publishedPosts = posts.filter((p) => p.published && p.inSitemap !== false);
+
+    const postEntries = publishedPosts
+      .map((p) => `  <url>
+    <loc>${SITE_URL}/bloq/${p.slug}</loc>
+    <lastmod>${(p.updatedAt || p.createdAt).split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`)
+      .join('\n');
+
+    const categories = await readData(FILES.categories);
+    const categoryEntries = categories.length > 0 ? categories
+      .map((c) => `  <url>
+    <loc>${SITE_URL}/bloq?kateqoriya=${encodeURIComponent(c.name)}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>`)
+      .join('\n') : '';
 
     const staticUrls = [
       { loc: '/', priority: '1.0', changefreq: 'daily' },
@@ -935,25 +957,13 @@ app.get('/sitemap.xml', async (req, res) => {
     ];
 
     const urlEntries = staticUrls
-      .map(
-        (u) => `  <url>
+      .map((u) => `  <url>
     <loc>${SITE_URL}${u.loc}</loc>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
-  </url>`
-      )
+  </url>`)
       .join('\n');
 
-    const postEntries = publishedPosts
-      .map(
-        (p) => `  <url>
-    <loc>${SITE_URL}/bloq/${p.slug}</loc>
-    <lastmod>${p.updatedAt.split('T')[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>`
-      )
-      .join('\n');
 
     const pages = await readData(FILES.pages);
     const pageEntries = pages
@@ -972,6 +982,7 @@ app.get('/sitemap.xml', async (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urlEntries}
 ${postEntries}
+${categoryEntries}
 ${pageEntries}
 </urlset>`;
 
