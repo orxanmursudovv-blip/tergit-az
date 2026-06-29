@@ -957,6 +957,7 @@ app.get('/sitemap.xml', async (req, res) => {
 
     const pages = await readData(FILES.pages);
     const pageEntries = pages
+      .filter((p) => p.type !== 'static') // Statik səhifələr artıq yuxarıda var
       .map(
         (p) => `  <url>
     <loc>${SITE_URL}/asililiqlar/${p.slug}</loc>
