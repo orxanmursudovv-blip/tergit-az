@@ -1182,6 +1182,58 @@ function ContactPage() {
    ADDICTION DETAIL PAGE
    ============================================================ */
 
+const PAGE_THEMES = {
+  'sosial-media': {
+    gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+    accent: '#4FC3F7', accentDark: '#0288D1',
+    badge: 'rgba(79,195,247,0.15)', badgeText: '#4FC3F7',
+    tipsBg: '#f0f9ff', tipsBorder: '#0288D1'
+  },
+  'oyun': {
+    gradient: 'linear-gradient(135deg, #0a1628 0%, #1a2f1a 50%, #0d2b0d 100%)',
+    accent: '#69F0AE', accentDark: '#00C853',
+    badge: 'rgba(105,240,174,0.15)', badgeText: '#69F0AE',
+    tipsBg: '#f0fdf4', tipsBorder: '#00C853'
+  },
+  'siqaret': {
+    gradient: 'linear-gradient(135deg, #1a0000 0%, #2d0000 50%, #1a0a0a 100%)',
+    accent: '#FF8A80', accentDark: '#E53935',
+    badge: 'rgba(255,138,128,0.15)', badgeText: '#FF8A80',
+    tipsBg: '#fff5f5', tipsBorder: '#E53935'
+  },
+  'kofein': {
+    gradient: 'linear-gradient(135deg, #1a1000 0%, #2d1f00 50%, #3d2b00 100%)',
+    accent: '#FFCC80', accentDark: '#E65100',
+    badge: 'rgba(255,204,128,0.15)', badgeText: '#FFCC80',
+    tipsBg: '#fffbf0', tipsBorder: '#E65100'
+  },
+  'fast-food': {
+    gradient: 'linear-gradient(135deg, #1a0d00 0%, #2d1500 50%, #3d2000 100%)',
+    accent: '#FFD54F', accentDark: '#F57F17',
+    badge: 'rgba(255,213,79,0.15)', badgeText: '#FFD54F',
+    tipsBg: '#fffdf0', tipsBorder: '#F57F17'
+  },
+  'alkoqol': {
+    gradient: 'linear-gradient(135deg, #1a0010 0%, #2d001e 50%, #1a0028 100%)',
+    accent: '#CE93D8', accentDark: '#7B1FA2',
+    badge: 'rgba(206,147,216,0.15)', badgeText: '#CE93D8',
+    tipsBg: '#fdf0ff', tipsBorder: '#7B1FA2'
+  },
+  'narkotik': {
+    gradient: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)',
+    accent: '#80CBC4', accentDark: '#00695C',
+    badge: 'rgba(128,203,196,0.15)', badgeText: '#80CBC4',
+    tipsBg: '#f0fffe', tipsBorder: '#00695C'
+  }
+};
+
+const DEFAULT_THEME = {
+  gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+  accent: '#76B852', accentDark: '#4a8f2a',
+  badge: 'rgba(118,184,82,0.15)', badgeText: '#76B852',
+  tipsBg: '#f0f9f4', tipsBorder: '#4a8f2a'
+};
+
 function AddictionDetailPage() {
   const { slug } = useParams();
   const [page, setPage] = useState(null);
@@ -1213,6 +1265,8 @@ function AddictionDetailPage() {
   if (loading) return <div className="container" style={{ padding: '120px 24px', textAlign: 'center' }}>Yüklənir…</div>;
   if (notFound || !page) return <NotFoundPage />;
 
+  const theme = PAGE_THEMES[page.slug] || DEFAULT_THEME;
+
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -1232,68 +1286,79 @@ function AddictionDetailPage() {
         jsonLd={articleJsonLd}
       />
 
-      {/* Hero */}
-      <section className="addiction-detail-hero">
+      {/* THEMED HERO */}
+      <section className="addiction-detail-hero" style={{ background: theme.gradient }}>
         <div className="container">
-          <Link to="/asililiqlar" className="addiction-detail-back">← Bütün asılılıqlar</Link>
+          <Link to="/asililiqlar" className="addiction-detail-back" style={{ color: theme.accent }}>
+            ← Bütün asılılıqlar
+          </Link>
           <div className="addiction-detail-hero__inner">
             <div>
-              <span className={`level-pill level-${page.level}`} style={{ marginBottom: 16, display: 'inline-block' }}>
+              <span className="addiction-detail-level-badge" style={{ background: theme.badge, color: theme.badgeText }}>
                 {page.levelLabel}
               </span>
-              <h1 className="addiction-detail-hero__title">
-                {page.icon} {page.title}
+              <h1 className="addiction-detail-hero__title" style={{ color: '#FFFFFF' }}>
+                <span className="addiction-detail-hero__icon">{page.icon}</span>
+                {page.title}
               </h1>
-              <p className="addiction-detail-hero__sub">{page.shortDesc}</p>
+              <p className="addiction-detail-hero__sub" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                {page.shortDesc}
+              </p>
+              <Link to="/elaqe" className="addiction-detail-cta" style={{ background: theme.accent, color: '#1a1a1a' }}>
+                Kömək al →
+              </Link>
             </div>
-            {page.heroImage && (
-              <img src={page.heroImage} alt={page.title} className="addiction-detail-hero__img" />
-            )}
+            <div className="addiction-detail-hero__emoji-wrap" style={{ borderColor: theme.accent }}>
+              {page.heroImage
+                ? <img src={page.heroImage} alt={page.title} className="addiction-detail-hero__img" />
+                : <span className="addiction-detail-hero__big-icon">{page.icon}</span>
+              }
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Məzmun */}
+      {/* MƏZMUN + TÖVSİYƏLƏR */}
       <section className="section">
         <div className="container addiction-detail-layout">
           <div className="addiction-detail-content">
-            <h2>Asılılıq haqqında</h2>
+            <h2 style={{ color: theme.accentDark }}>Asılılıq haqqında</h2>
             {page.content.split('\n\n').map((para, i) => (
               <p key={i}>{para}</p>
             ))}
           </div>
 
-          {/* Tövsiyələr */}
           {page.tips && page.tips.length > 0 && (
-            <div className="addiction-detail-tips">
-              <h3>Praktiki tövsiyələr</h3>
+            <div className="addiction-detail-tips" style={{ background: theme.tipsBg, borderColor: theme.tipsBorder }}>
+              <h3 style={{ color: theme.accentDark }}>✅ Praktiki tövsiyələr</h3>
               <ol className="addiction-detail-tips__list">
                 {page.tips.map((tip, i) => (
-                  <li key={i}>{tip}</li>
+                  <li key={i} style={{ borderLeft: `3px solid ${theme.accentDark}` }}>{tip}</li>
                 ))}
               </ol>
-              <div style={{ marginTop: 24 }}>
-                <Link to="/elaqe" className="btn btn-primary">Kömək al →</Link>
-              </div>
+              <Link to="/elaqe" className="btn btn-primary" style={{ marginTop: 24, display: 'inline-flex', background: theme.accentDark, boxShadow: 'none' }}>
+                Mütəxəssislə əlaqə →
+              </Link>
             </div>
           )}
         </div>
       </section>
 
-      {/* Digər asılılıqlar */}
+      {/* DİGƏR ASILILIQLAR */}
       <section className="section" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', padding: '50px 0' }}>
         <div className="container">
           <h3 style={{ marginBottom: 24, color: 'var(--text-dark)' }}>Digər asılılıqlar</h3>
-          <div className="addiction-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px,1fr))' }}>
-            {ADDICTIONS.filter((a) => a.id !== slug).map((a) => (
-              <Link key={a.id} to={`/asililiqlar/${a.id}`} className="addiction-mini-card">
-                <span>{a.icon}</span>
-                <span>{a.name}</span>
-                <span className={`level-pill level-${a.level}`} style={{ fontSize: 10, padding: '2px 8px' }}>
-                  {LEVEL_LABELS[a.level]}
-                </span>
-              </Link>
-            ))}
+          <div className="addiction-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))' }}>
+            {ADDICTIONS.filter((a) => a.id !== slug).map((a) => {
+              const t = PAGE_THEMES[a.id] || DEFAULT_THEME;
+              return (
+                <Link key={a.id} to={`/asililiqlar/${a.id}`} className="addiction-mini-card" style={{ borderTop: `3px solid ${t.accentDark}` }}>
+                  <span style={{ fontSize: 32 }}>{a.icon}</span>
+                  <span style={{ fontWeight: 600, color: 'var(--text-dark)' }}>{a.name}</span>
+                  <span style={{ fontSize: 11, color: t.accentDark }}>{LEVEL_LABELS[a.level]} risk</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

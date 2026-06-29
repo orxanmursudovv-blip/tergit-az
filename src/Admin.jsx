@@ -1118,40 +1118,29 @@ function SeoPanel() {
    SƏHIFƏ İDARƏSİ PANELİ
    ============================================================ */
 
-function PagesPanel({ token, onAuthError }) {
-  const { addToast } = useToast();
-  const [pages, setPages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
+/* ============================================================
+   SƏHIFƏ MODAL
+   ============================================================ */
+
+function PageModal({ page, token, onClose, onSaved, addToast }) {
+  const isEdit = Boolean(page);
+  const [form, setForm] = useState({
+    title: page?.title || '',
+    icon: page?.icon || '📄',
+    slug: page?.slug || '',
+    level: page?.level || 'orta',
+    levelLabel: page?.levelLabel || 'ORTA RİSK',
+    shortDesc: page?.shortDesc || '',
+    content: page?.content || '',
+    tips: (page?.tips || []).join('\n'),
+    heroImage: page?.heroImage || '',
+    metaTitle: page?.metaTitle || '',
+    metaDescription: page?.metaDescription || '',
+    metaKeywords: page?.metaKeywords || ''
+  });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({});
-  const [uploadingImg, setUploadingImg] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/pages')
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.success) setPages(j.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  function selectPage(page) {
-    setSelected(page);
-    setForm({
-      title: page.title || '',
-      shortDesc: page.shortDesc || '',
-      content: page.content || '',
-      tips: (page.tips || []).join('\n'),
-      heroImage: page.heroImage || '',
-      metaTitle: page.metaTitle || '',
-      metaDescription: page.metaDescription || '',
-      metaKeywords: page.metaKeywords || ''
-    });
-    setError('');
-  }
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -1160,162 +1149,224 @@ function PagesPanel({ token, onAuthError }) {
   async function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
-    setUploadingImg(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ name: file.name, type: file.type, data: reader.result })
-        });
-        const json = await res.json();
-        setUploadingImg(false);
-        if (json.success) {
-          update('heroImage', json.data.url);
-          addToast('Şəkil yükləndi.', 'success');
-        } else {
-          addToast(json.message || 'Şəkil yüklənə bilmədi.', 'error');
-        }
-      };
-      reader.readAsDataURL(file);
-    } catch {
-      setUploadingImg(false);
-      addToast('Şəkil yüklənə bilmədi.', 'error');
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: file.name, type: file.type, data: reader.result })
+      });
+      const json = await res.json();
+      setUploading(false);
+      if (json.success) { update('heroImage', json.data.url); addToast('Şəkil yükləndi.', 'success'); }
+      else addToast(json.message || 'Yüklənmə uğursuz.', 'error');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    if (!form.title.trim() || !form.slug.trim()) {
+      setError('Başlıq və slug tələb olunur.');
+      return;
+    }
+    setSaving(true);
+    const payload = { ...form, tips: form.tips.split('\n').map((t) => t.trim()).filter(Boolean) };
+    const url = isEdit ? `/api/pages/${page.id}` : '/api/pages';
+    const method = isEdit ? 'PUT' : 'POST';
+    const res = await apiRequest(url, { method, token, body: payload });
+    setSaving(false);
+    if (res.success) {
+      addToast(res.message || (isEdit ? 'Səhifə yeniləndi.' : 'Səhifə əlavə edildi.'), 'success');
+      onSaved();
+    } else {
+      setError(res.message || 'Əməliyyat uğursuz oldu.');
     }
   }
 
-  async function handleSave() {
-    if (!selected) return;
-    setSaving(true);
-    setError('');
-    const payload = {
-      ...form,
-      tips: form.tips.split('\n').map((t) => t.trim()).filter(Boolean)
-    };
-    const res = await apiRequest(`/api/pages/${selected.id}`, {
-      method: 'PUT', token, body: payload
-    });
-    setSaving(false);
+  const LEVEL_OPTIONS = [
+    { value: 'yuksek', label: 'Yüksək Rİsk', text: 'YÜKSƏK RİSK' },
+    { value: 'orta', label: 'Orta Risk', text: 'ORTA RİSK' },
+    { value: 'asagi', label: 'Aşağı Risk', text: 'AŞAĞI RİSK' }
+  ];
+
+  return (
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" style={{ maxWidth: 700 }}>
+        <h3>{isEdit ? 'Səhifəni redaktə et' : 'Yeni səhifə əlavə et'}</h3>
+        {error && <div className="error-banner">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="field-row">
+            <div className="field" style={{ maxWidth: 80 }}>
+              <label>İkon</label>
+              <input type="text" value={form.icon} onChange={(e) => update('icon', e.target.value)} style={{ textAlign: 'center', fontSize: 22 }} />
+            </div>
+            <div className="field" style={{ flex: 1 }}>
+              <label>Başlıq</label>
+              <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
+            </div>
+          </div>
+
+          <div className="field-row">
+            <div className="field">
+              <label>Slug (URL-dəki ad)</label>
+              <input type="text" value={form.slug} onChange={(e) => update('slug', e.target.value)} placeholder="meselen-sosial-media" />
+            </div>
+            <div className="field">
+              <label>Risk səviyyəsi</label>
+              <select value={form.level} onChange={(e) => {
+                const opt = LEVEL_OPTIONS.find((o) => o.value === e.target.value);
+                update('level', e.target.value);
+                update('levelLabel', opt?.text || '');
+              }}>
+                {LEVEL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="field">
+            <label>Qısa açıqlama (kart üzərindəki)</label>
+            <textarea value={form.shortDesc} onChange={(e) => update('shortDesc', e.target.value)} style={{ minHeight: 60 }} />
+          </div>
+
+          <div className="field">
+            <label>Əsas məzmun (hər abzas boş sətrlə ayrılır)</label>
+            <textarea value={form.content} onChange={(e) => update('content', e.target.value)} style={{ minHeight: 160 }} />
+          </div>
+
+          <div className="field">
+            <label>Tövsiyələr (hər sətir = 1 tövsiyə)</label>
+            <textarea value={form.tips} onChange={(e) => update('tips', e.target.value)} style={{ minHeight: 100 }} placeholder="Hər sətirə bir tövsiyə yazın" />
+          </div>
+
+          <div className="field">
+            <label>Baş şəkil</label>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <input type="text" placeholder="https://..." value={form.heroImage} onChange={(e) => update('heroImage', e.target.value)} style={{ flex: 1 }} />
+              <label className="btn btn-ghost btn-sm" style={{ cursor: 'pointer' }}>
+                {uploading ? 'Yüklənir…' : '📁 Şəkil'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+              </label>
+            </div>
+            {form.heroImage && <img src={form.heroImage} alt="preview" style={{ marginTop: 8, maxHeight: 80, borderRadius: 6, border: '1px solid var(--border)' }} />}
+          </div>
+
+          <div className="field-row">
+            <div className="field">
+              <label>Meta başlıq</label>
+              <input type="text" value={form.metaTitle} onChange={(e) => update('metaTitle', e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Meta açar sözlər</label>
+              <input type="text" value={form.metaKeywords} onChange={(e) => update('metaKeywords', e.target.value)} />
+            </div>
+          </div>
+
+          <div className="field">
+            <label>Meta açıqlama</label>
+            <textarea value={form.metaDescription} onChange={(e) => update('metaDescription', e.target.value)} />
+          </div>
+
+          <div className="row-actions" style={{ marginTop: 22, justifyContent: 'flex-end' }}>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Ləğv et</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saxlanılır…' : 'Saxla'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SƏHIFƏ İDARƏSİ PANELİ
+   ============================================================ */
+
+function PagesPanel({ token, onAuthError }) {
+  const { addToast } = useToast();
+  const [pages, setPages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalState, setModalState] = useState({ open: false, page: null });
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await apiRequest('/api/pages', { token });
     if (res.authError) return onAuthError();
-    if (res.success) {
-      addToast('Səhifə yeniləndi.', 'success');
-      setPages((prev) => prev.map((p) => p.id === selected.id ? res.data : p));
-      setSelected(res.data);
-    } else {
-      setError(res.message || 'Yadda saxlama uğursuz oldu.');
-    }
+    if (res.success) setPages(res.data);
+    setLoading(false);
+  }, [token, onAuthError]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  async function handleDelete(page) {
+    if (!window.confirm(`"${page.title}" səhifəsini silmək istədiyinizə əminsiniz?`)) return;
+    const res = await apiRequest(`/api/pages/${page.id}`, { method: 'DELETE', token });
+    if (res.authError) return onAuthError();
+    if (res.success) { addToast('Səhifə silindi.', 'success'); loadData(); }
+    else addToast(res.message || 'Silinmə uğursuz oldu.', 'error');
   }
 
   return (
     <div>
       <div className="admin-topbar">
         <h1>Səhifə İdarəsi</h1>
+        <button className="btn btn-primary" onClick={() => setModalState({ open: true, page: null })}>
+          + Yeni səhifə
+        </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 24, alignItems: 'start' }}>
-        {/* Sol: Səhifə siyahısı */}
-        <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-          {loading && <div style={{ padding: 20, color: 'var(--muted)' }}>Yüklənir…</div>}
-          {pages.map((p) => (
-            <div
-              key={p.id}
-              onClick={() => selectPage(p)}
-              style={{
-                padding: '14px 18px', cursor: 'pointer', fontSize: 14,
-                borderBottom: '1px solid var(--border)',
-                background: selected?.id === p.id ? 'rgba(118,184,82,0.08)' : 'transparent',
-                borderLeft: selected?.id === p.id ? '3px solid var(--accent)' : '3px solid transparent',
-                display: 'flex', alignItems: 'center', gap: 10
-              }}
-            >
-              <span style={{ fontSize: 20 }}>{p.icon}</span>
-              <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-dark)' }}>{p.title}</div>
-                <span className={`tag-pill ${p.level === 'yuksek' ? 'pill-danger' : p.level === 'orta' ? 'pill-muted' : 'pill-success'}`}
-                  style={{ fontSize: 10, padding: '2px 7px' }}>
-                  {p.levelLabel}
-                </span>
-              </div>
-            </div>
-          ))}
+      <div className="panel">
+        <div className="panel-head">
+          <h3>Bütün səhifələr ({pages.length})</h3>
         </div>
-
-        {/* Sağ: Redaktə */}
-        {!selected ? (
-          <div className="empty-state">Sol tərəfdən redaktə etmək istədiyiniz asılılıq səhifəsini seçin.</div>
-        ) : (
-          <div className="panel">
-            <div className="panel-head">
-              <h3>{selected.icon} {selected.title}</h3>
-            </div>
-
-            {error && <div className="error-banner">{error}</div>}
-
-            <div className="field">
-              <label>Başlıq</label>
-              <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
-            </div>
-
-            <div className="field">
-              <label>Qısa açıqlama (kart üzərindəki)</label>
-              <textarea value={form.shortDesc} onChange={(e) => update('shortDesc', e.target.value)} style={{ minHeight: 70 }} />
-            </div>
-
-            <div className="field">
-              <label>Əsas məzmun (hər abzas boş sətrlə ayrılır)</label>
-              <textarea value={form.content} onChange={(e) => update('content', e.target.value)} style={{ minHeight: 200 }} />
-            </div>
-
-            <div className="field">
-              <label>Tövsiyələr (hər sətir = 1 tövsiyə)</label>
-              <textarea value={form.tips} onChange={(e) => update('tips', e.target.value)} style={{ minHeight: 130 }} placeholder="Hər sətirə bir tövsiyə yazın" />
-            </div>
-
-            <div className="field">
-              <label>Baş şəkil</label>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                <input
-                  type="text"
-                  value={form.heroImage}
-                  onChange={(e) => update('heroImage', e.target.value)}
-                  placeholder="https://... (URL)"
-                  style={{ flex: 1 }}
-                />
-                <label className="btn btn-ghost btn-sm" style={{ cursor: 'pointer' }}>
-                  {uploadingImg ? 'Yüklənir…' : '📁 Fayl seç'}
-                  <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
-                </label>
-              </div>
-              {form.heroImage && (
-                <img src={form.heroImage} alt="preview" style={{ marginTop: 10, maxHeight: 120, borderRadius: 8, border: '1px solid var(--border)' }} />
-              )}
-            </div>
-
-            <div className="field-row">
-              <div className="field">
-                <label>Meta başlıq (SEO)</label>
-                <input type="text" value={form.metaTitle} onChange={(e) => update('metaTitle', e.target.value)} />
-              </div>
-              <div className="field">
-                <label>Meta açar sözlər</label>
-                <input type="text" value={form.metaKeywords} onChange={(e) => update('metaKeywords', e.target.value)} />
-              </div>
-            </div>
-
-            <div className="field">
-              <label>Meta açıqlama (SEO)</label>
-              <textarea value={form.metaDescription} onChange={(e) => update('metaDescription', e.target.value)} />
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 22 }}>
-              <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-                {saving ? 'Saxlanılır…' : 'Yadda saxla'}
-              </button>
-            </div>
-          </div>
-        )}
+        <table>
+          <thead>
+            <tr>
+              <th>İkon</th>
+              <th>Başlıq</th>
+              <th>Slug</th>
+              <th>Risk</th>
+              <th>Yenilənib</th>
+              <th>Əməliyyat</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && <tr className="empty-row"><td colSpan={6}>Yüklənir…</td></tr>}
+            {!loading && pages.length === 0 && <tr className="empty-row"><td colSpan={6}>Hələ səhifə yoxdur.</td></tr>}
+            {!loading && pages.map((p) => (
+              <tr key={p.id}>
+                <td style={{ fontSize: 22 }}>{p.icon}</td>
+                <td><strong>{p.title}</strong></td>
+                <td><code style={{ fontSize: 12 }}>/asililiqlar/{p.slug}</code></td>
+                <td>
+                  <span className={`tag-pill ${p.level === 'yuksek' ? 'pill-danger' : p.level === 'orta' ? 'pill-muted' : 'pill-success'}`}>
+                    {p.levelLabel || p.level}
+                  </span>
+                </td>
+                <td>{formatDate(p.updatedAt)}</td>
+                <td>
+                  <div className="row-actions">
+                    <a href={`/asililiqlar/${p.slug}`} target="_blank" rel="noopener noreferrer" className="icon-btn" title="Saytda aç">👁</a>
+                    <button className="icon-btn" title="Redaktə et" onClick={() => setModalState({ open: true, page: p })}>✎</button>
+                    <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      {modalState.open && (
+        <PageModal
+          page={modalState.page}
+          token={token}
+          addToast={addToast}
+          onClose={() => setModalState({ open: false, page: null })}
+          onSaved={() => { setModalState({ open: false, page: null }); loadData(); }}
+        />
+      )}
     </div>
   );
 }
