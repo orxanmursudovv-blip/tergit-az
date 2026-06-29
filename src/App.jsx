@@ -963,6 +963,27 @@ function BlogListPage() {
    BLOG POST PAGE
    ============================================================ */
 
+/* ============================================================
+   FAQ ACCORDION KOMPONENTİ
+   ============================================================ */
+
+function FaqItem({ question, answer }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`faq-item${open ? ' open' : ''}`}>
+      <button className="faq-item__q" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span>{question}</span>
+        <span className="faq-item__arrow">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && <div className="faq-item__a">{answer}</div>}
+    </div>
+  );
+}
+
+/* ============================================================
+   BLOG POST PAGE
+   ============================================================ */
+
 function BlogPostPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -1015,12 +1036,36 @@ function BlogPostPage() {
     '@type': 'Article',
     headline: post.title,
     description: post.metaDescription,
-    image: post.ogImage ? [post.ogImage] : undefined,
+    image: (post.featuredImage || post.ogImage) ? [post.featuredImage || post.ogImage] : undefined,
     datePublished: post.createdAt,
     dateModified: post.updatedAt,
     author: { '@type': 'Organization', name: SITE_NAME },
     publisher: { '@type': 'Organization', name: SITE_NAME }
   };
+
+  // FAQ Schema
+  const faqVisible = (post.faq || []).filter((f) => f.show && f.question && f.answer);
+  const faqAll = (post.faq || []).filter((f) => f.question && f.answer);
+  const faqJsonLd = faqAll.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqAll.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer }
+    }))
+  } : null;
+
+  // dd.mm.yyyy format
+  function formatDateDMY(dateStr) {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
+
+  const canonicalPath = post.canonicalUrl || `${SITE_URL}/bloq/${post.slug}`;
 
   return (
     <div className="page-enter">
@@ -1030,23 +1075,50 @@ function BlogPostPage() {
         keywords={post.metaKeywords}
         path={`/bloq/${post.slug}`}
         ogType="article"
-        ogImage={post.ogImage}
+        ogImage={post.featuredImage || post.ogImage}
         jsonLd={articleJsonLd}
       />
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
+      {post.noIndex && (
+        <meta name="robots" content="noindex,nofollow" />
+      )}
 
       <article className="section">
         <div className="container post-detail">
-          {post.ogImage && <img className="post-detail__cover" src={post.ogImage} alt={post.title} />}
-          <h1>{post.title}</h1>
+          {/* Featured image */}
+          {post.featuredImage && (
+            <img
+              className="post-detail__cover"
+              src={post.featuredImage}
+              alt={post.imageAlt || post.title}
+            />
+          )}
+
+          {/* Başlıq — qara və bold */}
+          <h1 style={{ color: '#1a1a1a', fontWeight: 800 }}>{post.title}</h1>
+
           <div className="post-detail__meta">
-            <span>{new Date(post.createdAt).toLocaleDateString('az-AZ', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span>{formatDateDMY(post.createdAt)}</span>
             <span>· {post.views || 0} baxış</span>
           </div>
+
           <div className="post-detail__content">
             {post.content.split('\n').filter(Boolean).map((para, i) => (
               <p key={i}>{para}</p>
             ))}
           </div>
+
+          {/* FAQ Accordion */}
+          {faqVisible.length > 0 && (
+            <div className="post-faq">
+              <h3 className="post-faq__title">Tez-tez verilən suallar</h3>
+              {faqVisible.map((item, i) => (
+                <FaqItem key={i} question={item.question} answer={item.answer} />
+              ))}
+            </div>
+          )}
         </div>
       </article>
     </div>

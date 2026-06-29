@@ -284,22 +284,80 @@ function DashboardPanel({ token, onAuthError }) {
 
 function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
   const isEdit = Boolean(post);
+  const [activeTab, setActiveTab] = useState('content');
   const [form, setForm] = useState({
     title: post?.title || '',
     slug: post?.slug || '',
     categoryId: post?.categoryId || categories[0]?.id || '',
     content: post?.content || '',
+    published: post?.published || false,
+    // Şəkil
+    featuredImage: post?.featuredImage || '',
+    imageAlt: post?.imageAlt || '',
+    ogImage: post?.ogImage || '',
+    useOgFromFeatured: post?.useOgFromFeatured !== false,
+    // SEO
     metaTitle: post?.metaTitle || '',
     metaDescription: post?.metaDescription || '',
+    focusKeyword: post?.focusKeyword || '',
     metaKeywords: post?.metaKeywords || '',
-    ogImage: post?.ogImage || '',
-    published: post?.published || false
+    canonicalUrl: post?.canonicalUrl || '',
+    noIndex: post?.noIndex || false,
+    inSitemap: post?.inSitemap !== false,
+    // FAQ
+    faq: post?.faq || []
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  async function uploadImage(file, targetField) {
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: file.name, type: file.type, data: reader.result })
+      });
+      const json = await res.json();
+      setUploading(false);
+      if (json.success) {
+        update(targetField, json.data.url);
+        addToast('Şəkil yükləndi.', 'success');
+      } else {
+        addToast(json.message || 'Şəkil yüklənə bilmədi.', 'error');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // FAQ funksiyaları
+  function addFaq() {
+    setForm((f) => ({ ...f, faq: [...f.faq, { question: '', answer: '', show: true }] }));
+  }
+  function updateFaq(i, field, value) {
+    setForm((f) => {
+      const faq = [...f.faq];
+      faq[i] = { ...faq[i], [field]: value };
+      return { ...f, faq };
+    });
+  }
+  function removeFaq(i) {
+    setForm((f) => ({ ...f, faq: f.faq.filter((_, idx) => idx !== i) }));
+  }
+  function moveFaq(i, dir) {
+    setForm((f) => {
+      const faq = [...f.faq];
+      const j = i + dir;
+      if (j < 0 || j >= faq.length) return f;
+      [faq[i], faq[j]] = [faq[j], faq[i]];
+      return { ...f, faq };
+    });
   }
 
   async function handleSubmit(e) {
@@ -310,13 +368,14 @@ function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
       return;
     }
     setSaving(true);
+    const payload = {
+      ...form,
+      ogImage: form.useOgFromFeatured ? form.featuredImage : form.ogImage
+    };
     const res = await apiRequest(isEdit ? `/api/posts/${post.id}` : '/api/posts', {
-      method: isEdit ? 'PUT' : 'POST',
-      token,
-      body: form
+      method: isEdit ? 'PUT' : 'POST', token, body: payload
     });
     setSaving(false);
-
     if (res.success) {
       addToast(res.message || (isEdit ? 'Məqalə yeniləndi.' : 'Məqalə əlavə edildi.'), 'success');
       onSaved();
@@ -325,125 +384,184 @@ function PostModal({ post, categories, token, onClose, onSaved, addToast }) {
     }
   }
 
+  const TABS = [
+    { id: 'content', label: '📝 Məzmun' },
+    { id: 'image', label: '🖼 Şəkil' },
+    { id: 'seo', label: '🔍 SEO' },
+    { id: 'faq', label: '❓ FAQ' }
+  ];
+
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-card">
+      <div className="modal-card" style={{ maxWidth: 740 }}>
         <h3>{isEdit ? 'Məqaləni redaktə et' : 'Yeni məqalə əlavə et'}</h3>
-
         {error && <div className="error-banner">{error}</div>}
 
+        {/* Tab başlıqları */}
+        <div className="modal-tabs">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`modal-tab${activeTab === t.id ? ' active' : ''}`}
+              onClick={() => setActiveTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         <form onSubmit={handleSubmit}>
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="post-title">Başlıq</label>
-              <input id="post-title" type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
+          {/* ── MƏZMUN TAB ── */}
+          {activeTab === 'content' && (
+            <div>
+              <div className="field-row">
+                <div className="field">
+                  <label>Başlıq</label>
+                  <input type="text" value={form.title} onChange={(e) => update('title', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Slug (boş saxlasan avtomatik)</label>
+                  <input type="text" value={form.slug} onChange={(e) => update('slug', e.target.value)} />
+                </div>
+              </div>
+              <div className="field">
+                <label>Kateqoriya</label>
+                <select value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)}>
+                  {categories.length === 0 && <option value="">Əvvəlcə kateqoriya yaradın</option>}
+                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label>Məzmun</label>
+                <textarea value={form.content} onChange={(e) => update('content', e.target.value)} style={{ minHeight: 220 }} />
+              </div>
+              <div className="checkbox-row">
+                <input type="checkbox" id="post-published" checked={form.published} onChange={(e) => update('published', e.target.checked)} />
+                <label htmlFor="post-published">Dərc olunsun (saytda görünsün)</label>
+              </div>
             </div>
-            <div className="field">
-              <label htmlFor="post-slug">Slug (boş saxlasan avtomatik yaranır)</label>
-              <input id="post-slug" type="text" value={form.slug} onChange={(e) => update('slug', e.target.value)} />
-            </div>
-          </div>
+          )}
 
-          <div className="field">
-            <label htmlFor="post-category">Kateqoriya</label>
-            <select id="post-category" value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)}>
-              {categories.length === 0 && <option value="">Əvvəlcə kateqoriya yaradın</option>}
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+          {/* ── ŞƏKİL TAB ── */}
+          {activeTab === 'image' && (
+            <div>
+              <div className="field">
+                <label>Əsas şəkil (Featured Image) — 1200×630px tövsiyə olunur</label>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <input type="text" placeholder="https://..." value={form.featuredImage} onChange={(e) => update('featuredImage', e.target.value)} style={{ flex: 1 }} />
+                  <label className="btn btn-ghost btn-sm" style={{ cursor: 'pointer' }}>
+                    {uploading ? 'Yüklənir…' : '📁 Yüklə'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0], 'featuredImage')} />
+                  </label>
+                </div>
+                {form.featuredImage && <img src={form.featuredImage} alt="preview" style={{ marginTop: 8, maxHeight: 120, borderRadius: 8, border: '1px solid var(--border)' }} />}
+              </div>
+
+              <div className="field">
+                <label>Şəkil Alt Text (SEO üçün)</label>
+                <input type="text" placeholder="Şəkili təsvir edin…" value={form.imageAlt} onChange={(e) => update('imageAlt', e.target.value)} />
+              </div>
+
+              <div className="checkbox-row" style={{ marginBottom: 16 }}>
+                <input type="checkbox" id="use-og-featured" checked={form.useOgFromFeatured} onChange={(e) => update('useOgFromFeatured', e.target.checked)} />
+                <label htmlFor="use-og-featured">OG şəkli kimi Əsas şəkili istifadə et</label>
+              </div>
+
+              {!form.useOgFromFeatured && (
+                <div className="field">
+                  <label>OG Şəkil (ayrıca)</label>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    <input type="text" placeholder="https://..." value={form.ogImage} onChange={(e) => update('ogImage', e.target.value)} style={{ flex: 1 }} />
+                    <label className="btn btn-ghost btn-sm" style={{ cursor: 'pointer' }}>
+                      📁 Yüklə
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0], 'ogImage')} />
+                    </label>
+                  </div>
+                  {form.ogImage && <img src={form.ogImage} alt="og preview" style={{ marginTop: 8, maxHeight: 100, borderRadius: 6, border: '1px solid var(--border)' }} />}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── SEO TAB ── */}
+          {activeTab === 'seo' && (
+            <div>
+              <div className="field">
+                <label>SEO Başlığı <span style={{ color: form.metaTitle.length > 60 ? 'var(--danger)' : 'var(--muted)', fontSize: 12 }}>{form.metaTitle.length}/60</span></label>
+                <input type="text" value={form.metaTitle} onChange={(e) => update('metaTitle', e.target.value)} maxLength={70} />
+              </div>
+              <div className="field">
+                <label>Meta Description <span style={{ color: form.metaDescription.length > 160 ? 'var(--danger)' : 'var(--muted)', fontSize: 12 }}>{form.metaDescription.length}/160</span></label>
+                <textarea value={form.metaDescription} onChange={(e) => update('metaDescription', e.target.value)} style={{ minHeight: 80 }} maxLength={180} />
+              </div>
+              <div className="field-row">
+                <div className="field">
+                  <label>Fokus Açar Söz</label>
+                  <input type="text" placeholder="əsas axtarış açar sözü" value={form.focusKeyword} onChange={(e) => update('focusKeyword', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Meta Açar Sözlər</label>
+                  <input type="text" placeholder="vergüllə ayrılmış" value={form.metaKeywords} onChange={(e) => update('metaKeywords', e.target.value)} />
+                </div>
+              </div>
+              <div className="field">
+                <label>Canonical URL (boş saxlasan avtomatik)</label>
+                <input type="text" placeholder={`https://tergit.az/bloq/${form.slug}`} value={form.canonicalUrl} onChange={(e) => update('canonicalUrl', e.target.value)} />
+              </div>
+              <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginTop: 8 }}>
+                <div className="checkbox-row">
+                  <input type="checkbox" id="post-noindex" checked={form.noIndex} onChange={(e) => update('noIndex', e.target.checked)} />
+                  <label htmlFor="post-noindex">Noindex (axtarış motorlarından gizlət)</label>
+                </div>
+                <div className="checkbox-row">
+                  <input type="checkbox" id="post-sitemap" checked={form.inSitemap} onChange={(e) => update('inSitemap', e.target.checked)} />
+                  <label htmlFor="post-sitemap">Sitemap-a əlavə et</label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── FAQ TAB ── */}
+          {activeTab === 'faq' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <p style={{ color: 'var(--muted)', fontSize: 13 }}>FAQ-lar Schema.org markup-ı ilə əlavə olunur. "Səhifədə göstər" seçilənlər accordion kimi görünür.</p>
+                <button type="button" className="btn btn-primary btn-sm" onClick={addFaq}>+ Sual əlavə et</button>
+              </div>
+
+              {form.faq.length === 0 && <div className="empty-state" style={{ padding: '30px 0' }}>Hələ FAQ yoxdur. "Sual əlavə et" basın.</div>}
+
+              {form.faq.map((item, i) => (
+                <div key={i} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 16, marginBottom: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--muted)' }}>Sual {i + 1}</span>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button type="button" className="icon-btn" onClick={() => moveFaq(i, -1)} disabled={i === 0}>↑</button>
+                      <button type="button" className="icon-btn" onClick={() => moveFaq(i, 1)} disabled={i === form.faq.length - 1}>↓</button>
+                      <button type="button" className="icon-btn" onClick={() => removeFaq(i)}>🗑</button>
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label>Sual</label>
+                    <input type="text" value={item.question} onChange={(e) => updateFaq(i, 'question', e.target.value)} placeholder="Sual yazın…" />
+                  </div>
+                  <div className="field">
+                    <label>Cavab</label>
+                    <textarea value={item.answer} onChange={(e) => updateFaq(i, 'answer', e.target.value)} placeholder="Cavab yazın…" style={{ minHeight: 80 }} />
+                  </div>
+                  <div className="checkbox-row">
+                    <input type="checkbox" id={`faq-show-${i}`} checked={item.show} onChange={(e) => updateFaq(i, 'show', e.target.checked)} />
+                    <label htmlFor={`faq-show-${i}`}>Səhifədə göstər</label>
+                  </div>
+                </div>
               ))}
-            </select>
-          </div>
-
-          <div className="field">
-            <label htmlFor="post-content">Məzmun</label>
-            <textarea
-              id="post-content"
-              value={form.content}
-              onChange={(e) => update('content', e.target.value)}
-              style={{ minHeight: 180 }}
-            />
-          </div>
-
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="post-meta-title">Meta başlıq (SEO)</label>
-              <input id="post-meta-title" type="text" value={form.metaTitle} onChange={(e) => update('metaTitle', e.target.value)} />
             </div>
-            <div className="field">
-              <label htmlFor="post-meta-keywords">Meta açar sözlər</label>
-              <input id="post-meta-keywords" type="text" value={form.metaKeywords} onChange={(e) => update('metaKeywords', e.target.value)} />
-            </div>
-          </div>
-
-          <div className="field">
-            <label htmlFor="post-meta-description">Meta açıqlama (SEO)</label>
-            <textarea
-              id="post-meta-description"
-              value={form.metaDescription}
-              onChange={(e) => update('metaDescription', e.target.value)}
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="post-og-image">OG şəkil</label>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-              <input
-                id="post-og-image"
-                type="text"
-                placeholder="https://..."
-                value={form.ogImage}
-                onChange={(e) => update('ogImage', e.target.value)}
-                style={{ flex: 1 }}
-              />
-              <label className="btn btn-ghost btn-sm" style={{ cursor: 'pointer' }}>
-                📁 Şəkil yüklə
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = async () => {
-                      const res = await fetch('/api/upload', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                        body: JSON.stringify({ name: file.name, type: file.type, data: reader.result })
-                      });
-                      const json = await res.json();
-                      if (json.success) {
-                        update('ogImage', json.data.url);
-                        addToast('Şəkil yükləndi.', 'success');
-                      } else {
-                        addToast(json.message || 'Şəkil yüklənə bilmədi.', 'error');
-                      }
-                    };
-                    reader.readAsDataURL(file);
-                  }}
-                />
-              </label>
-            </div>
-            {form.ogImage && (
-              <img src={form.ogImage} alt="preview" style={{ marginTop: 8, maxHeight: 100, borderRadius: 6, border: '1px solid var(--border)' }} />
-            )}
-          </div>
-
-          <div className="checkbox-row">
-            <input
-              id="post-published"
-              type="checkbox"
-              checked={form.published}
-              onChange={(e) => update('published', e.target.checked)}
-            />
-            <label htmlFor="post-published">Dərc olunsun (saytda görünsün)</label>
-          </div>
+          )}
 
           <div className="row-actions" style={{ marginTop: 22, justifyContent: 'flex-end' }}>
             <button type="button" className="btn btn-ghost" onClick={onClose}>Ləğv et</button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saxlanılır…' : 'Saxla'}
-            </button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saxlanılır…' : 'Saxla'}</button>
           </div>
         </form>
       </div>
