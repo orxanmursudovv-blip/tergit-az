@@ -1345,7 +1345,9 @@ function PagesPanel({ token, onAuthError }) {
                 </td>
                 <td>
                   <code style={{ fontSize: 12 }}>
-                    {p.slug ? `/asililiqlar/${p.slug}` : '/'}
+                    {p.type === 'static'
+                      ? (p.slug ? `/${p.slug}` : '/')
+                      : `/asililiqlar/${p.slug}`}
                   </code>
                 </td>
                 <td>
@@ -1358,7 +1360,7 @@ function PagesPanel({ token, onAuthError }) {
                 <td>{formatDate(p.updatedAt)}</td>
                 <td>
                   <div className="row-actions">
-                    <a href={p.slug ? `/asililiqlar/${p.slug}` : '/'} target="_blank" rel="noopener noreferrer" className="icon-btn" title="Saytda aç">👁</a>
+                    <a href={p.type === 'static' ? (p.slug ? `/${p.slug}` : '/') : `/asililiqlar/${p.slug}`} target="_blank" rel="noopener noreferrer" className="icon-btn" title="Saytda aç">👁</a>
                     <button className="icon-btn" title="Redaktə et" onClick={() => setModalState({ open: true, page: p })}>✎</button>
                     {p.type !== 'static' && (
                       <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
