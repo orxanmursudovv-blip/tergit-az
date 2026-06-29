@@ -49,14 +49,14 @@ let ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || null;
    ============================================================ */
 
 const DATA_DIR = path.join(__dirname, 'data');
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
 const FILES = {
   messages: path.join(DATA_DIR, 'messages.json'),
   subscribers: path.join(DATA_DIR, 'subscribers.json'),
   posts: path.join(DATA_DIR, 'posts.json'),
   categories: path.join(DATA_DIR, 'categories.json'),
   blockedIps: path.join(DATA_DIR, 'blocked-ips.json'),
-  pages: path.join(DATA_DIR, 'pages.json'),
-  robotsTxt: path.join(DATA_DIR, 'robots.txt')
+  pages: path.join(DATA_DIR, 'pages.json')
 };
 
 const SEED_CATEGORIES = [
@@ -108,10 +108,131 @@ function emptyArrayFile() {
   return '[]';
 }
 
+const SEED_PAGES = [
+  {
+    id: 'page_sosial', slug: 'sosial-media', icon: '📱', title: 'Sosial Media Asılılığı',
+    level: 'orta', levelLabel: 'ORTA RİSK',
+    shortDesc: 'Sosial media platformaları beynimizdə dopamin dövriyyəsini formalaşdıraraq asılılığa yol açır.',
+    content: 'Sosial media asılılığı müasir dünyanın ən geniş yayılmış asılılıq formalarından biridir. Instagram, TikTok, Facebook kimi platformalar istifadəçilərin diqqətini maksimum saxlamaq üçün xüsusi alqoritmlər tətbiq edir.\n\nBeynimizdəki dopamin sistemi hər "bəyənmə" və ya bildirişlə aktivləşir — bu isə müsbət güclənmə dövriyyəsi yaradır. Zamanla beyin daha çox stimula ehtiyac duyur.\n\nSosial media asılılığının əlamətləri: gündə 4+ saat ekran vaxtı, narahatlıq hissi olmadan telefonsuz qala bilməmək, sosial müqayisə nəticəsində özünə hörmətin azalması, real münasibətlərin zəifləməsi.',
+    tips: [
+      'Telefon istifadə vaxtını izləyən tətbiq quraşdırın (Screen Time, Digital Wellbeing)',
+      'Bildirişləri söndürün — yalnız vacib tətbiqlər üçün saxlayın',
+      'Yatmadan 1 saat əvvəl telefonu bağlayın',
+      'Yeməkdə, söhbətdə telefonsuz olun',
+      'Sosial mediaya alternativ hobbilər tapın — kitab, idman, yaradıcılıq'
+    ],
+    metaTitle: 'Sosial Media Asılılığı — Əlamətlər, Səbəblər və Həll Yolları | Tergit.az',
+    metaDescription: 'Sosial media asılılığından azad olmaq üçün praktiki tövsiyələr, əlamətlər və müalicə yolları. Ekran vaxtınızı azaldın.',
+    metaKeywords: 'sosial media asılılığı, instagram asılılığı, telefon asılılığı, ekran vaxtı, tiktok asılılığı',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_oyun', slug: 'oyun', icon: '🎮', title: 'Oyun (Gaming) Asılılığı',
+    level: 'orta', levelLabel: 'ORTA RİSK',
+    shortDesc: 'Video oyunlar güclü ödül mexanizmləri vasitəsilə kompulsiv istifadəyə sürükləyir.',
+    content: 'Oyun asılılığı 2018-ci ildən etibarən DSM-5 (Psixiatriya Diaqnostika Kitabçası) tərəfindən rəsmi pozuntu kimi tanınıb. Video oyunlar xüsusi olaraq motivasiya psixologiyasına əsaslanan mükəmməl ödül sistemi ilə layihələndirilir.\n\nBaşarı hissi, rəqabət, sosial mənsub olmaq, fasilə olmadan oxunan süjet — bunlar oyunçunu məşğul saxlayan əsas elementlərdir. MMO (massively multiplayer online) oyunlar xüsusilə güclü asılılıq potensialına malikdir.\n\nDünya Səhiyyə Təşkilatı məlumatlarına görə oyunçuların 3-4%-i klinik asılılıq meyarlarına cavab verir.',
+    tips: [
+      'Gündəlik oyun vaxtı limiti qoyun (maks. 2 saat)',
+      'Gecə yarısından sonra oynamayın',
+      'Hər saat başı 10 dəqiqə fasilə verin',
+      'Real həyatda sosial fəaliyyətlərə zaman ayırın',
+      'Oyun dostlarınızla real həyatda da görüşün'
+    ],
+    metaTitle: 'Oyun Asılılığı — Əlamətlər və Müalicə | Tergit.az',
+    metaDescription: 'Video oyun asılılığından necə qurtulmaq olar? Əlamətlər, səbəblər və praktiki tövsiyələr.',
+    metaKeywords: 'oyun asılılığı, gaming asılılığı, video oyun, kompüter oyun asılılığı',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_siqaret', slug: 'siqaret', icon: '🚬', title: 'Siqaret (Nikotin) Asılılığı',
+    level: 'yuksek', levelLabel: 'YÜKSƏK RİSK',
+    shortDesc: 'Nikotin bir neçə saniyə ərzində beyinə çataraq güclü fiziki və psixoloji asılılıq yaradır.',
+    content: 'Siqaret asılılığı həm fiziki (nikotin), həm də psixoloji komponentlərə malikdir. Nikotin tüstü vasitəsilə qan dövranına keçdikdən sonra 10-20 saniyə ərzində beyinə çatır — bu sürət heroindən belə daha sürətlidir.\n\nNikotin dopamin, serotonin və norepinefrin kimi neyrotransmitterləri stimullaşdırır. Zamanla beyin bu stimulasiyaya öyrəşir və onsuz normal işləyə bilmir.\n\nDünyada hər il 8 milyondan çox insan tütün istifadəsinə bağlı xəstəliklərdən həyatını itirir. Siqareti tərk etmək çətin olsa da tamamilə mümkündür — 60%-dən çox siqaret çəkən insan ömrü boyu tərk etməyə nail olur.',
+    tips: [
+      'Nikotin əvəzedicilərindən istifadə edin (patch, gum, inhaler)',
+      'Siqareti tərk etmə tarixini müəyyən edin və buna sadiq qalın',
+      'Tetikleyicilər tapın: nə vaxt, harada, hansı hisslə içirsiniz?',
+      'Tibb mütəxəssisindən dəstək alın — dərman müalicəsi mövcuddur',
+      'Siqaret çəkmədən keçirdiginiz hər günü qeyd edin'
+    ],
+    metaTitle: 'Siqareti Tərk Etmək — Praktiki Tövsiyələr | Tergit.az',
+    metaDescription: 'Siqaret asılılığından azad olmaq üçün effektiv üsullar, nikotin əvəziciləri və müalicə yolları.',
+    metaKeywords: 'siqareti tərk etmək, nikotin asılılığı, siqaret asılılığı, tütün asılılığı',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_kofein', slug: 'kofein', icon: '☕', title: 'Kofein Asılılığı',
+    level: 'asagi', levelLabel: 'AŞAĞI RİSK',
+    shortDesc: 'Kofein dünyada ən geniş istifadə olunan psixoaktiv maddədir, asılılıq potensialı aşağıdır.',
+    content: 'Kofein adenozin reseptorlarını bloklayaraq yorğunluq hissini azaldır. Gündə 400mg-a qədər kofein (4 fincan qəhvə) əksər sağlam yetkinlər üçün təhlükəsiz hesab edilir.\n\nAsılılıq, yüksək dozada kofein istifadəsi zamanı beynin kofeinə adaptasiya etməsi nəticəsidnər. Kəskin dayandırıldıqda baş ağrısı, yorğunluq, əhval pozulması kimi geri çəkilmə simptomları 1-2 gün davam edə bilər.\n\nKofein asılılığı digər asılılıqlara nisbətən zərərsizdir, lakin ürək döyünməsi, narahatlıq, yuxu problemlərinə yol aça bilər.',
+    tips: [
+      'Günlük kofein qəbulunu tədricən azaldın (ani dayandırma baş ağrısına yol açır)',
+      'Saat 14:00-dan sonra kofeinli içkilərdən çəkinin',
+      'Kofein mənbəyini müəyyən edin — çay, şokolad, enerji içkiləri',
+      'Su içməyi artırın — dehidrasiya yorğunluğu artırır',
+      'Qısa gəzinti ilə enerji artırın'
+    ],
+    metaTitle: 'Kofein Asılılığı — Əlamətlər və Azaltma Yolları | Tergit.az',
+    metaDescription: 'Kofein asılılığının əlamətləri, qəhvə istifadəsini azaltmaq üçün praktiki tövsiyələr.',
+    metaKeywords: 'kofein asılılığı, qəhvə asılılığı, kofein geri çəkilməsi',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_fastfood', slug: 'fast-food', icon: '🍔', title: 'Fast Food Asılılığı',
+    level: 'orta', levelLabel: 'ORTA RİSK',
+    shortDesc: 'Şəkər, yağ və duz kombinasiyası beyni stimullaşdıraraq kompulsiv yemə davranışına yol açır.',
+    content: 'Fast food məhsulları şəkər, yağ və duzun elmi cəhətdən hesablanmış kombinasiyası ilə hazırlanır — bu "bliss point" adlanır. Bu kombinasiya beyinin ödül sistemini yüksək dozada stimullaşdırır.\n\nTədqiqatlar göstərir ki, yüksək emal edilmiş qidalar narkotik maddələrə bənzər neyrokimyəvi reaksiyalar yaradır. Bəzi insanlarda bu maddi kompulsiv yemə davranışına — yeməyi dayandırmaqda çətinliyə — yol açır.\n\nObesite, diabet, ürək-damar xəstəlikləri ilə birbaşa əlaqəli olan fast food asılılığı həm fiziki, həm psixoloji müdaxilə tələb edir.',
+    tips: [
+      'Tam qidaları artırın: tərəvəz, meyvə, tam taxıl, zülallar',
+      'Fast food restoranlarına getmə tezliyini hər həftə 1-ə endirin',
+      'Evdə yeməkdən həzz alma öyrənin — sadə sağlam reseptlər axtarın',
+      'Emosional yemə tetikleyicilərini tanıyın',
+      'Qida gündəliyi yazın'
+    ],
+    metaTitle: 'Fast Food Asılılığı — Səbəblər və Həll Yolları | Tergit.az',
+    metaDescription: 'Fast food asılılığından azad olmaq, sağlam qidalanma vərdişləri qazanmaq üçün tövsiyələr.',
+    metaKeywords: 'fast food asılılığı, qida asılılığı, kompulsiv yemə, şəkər asılılığı',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_alkoqol', slug: 'alkoqol', icon: '🍷', title: 'Alkoqol Asılılığı',
+    level: 'yuksek', levelLabel: 'YÜKSƏK RİSK',
+    shortDesc: 'Alkoqol mərkəzi sinir sistemini birbaşa depressiya edir, fiziki asılılıq ciddi tibbi müdaxilə tələb edir.',
+    content: 'Alkoqol asılılığı (alkoqolizm) dünyada ən geniş yayılmış madde asılılığı formalarından biridir. Alkoqol GABA reseptorlarını gücləndirir və glutamat reseptorlarını bloklayır — bu relaxasiya hissi verir, lakin zamanla beyin bu effektə öyrəşir.\n\nFiziki alkoqol asılılığı inkişaf etdikdə kəsilmə sindromu həyati təhlükə yarada bilər — tibbi nəzarət olmadan alkoqoldan imtina etmək tövsiyə edilmir.\n\nAlkoqol qaraciyər xəstəliyi, ürək problemləri, sinir sistemi zədələnməsi, psixiatrik pozuntular və onlarca xərçəng növü ilə əlaqəlidir. Erkən müdaxilə son dərəcə vacibdir.',
+    tips: [
+      'Mütləq mütəxəssisə müraciət edin — kəskin imtina təhlükəlidir',
+      'Dəstək qruplarına qoşulun (Anonim Alkoqollar AA)',
+      'Tetikleyicilər müəyyən edin: insanlar, yerlər, hisslər',
+      'Alkoqolsuz içkilərlə əvəz edin — soda, limonlu su',
+      'Ailə dəstəyi çox vacibdir — yaxınlarınızla açıq danışın'
+    ],
+    metaTitle: 'Alkoqol Asılılığı — Müalicə və Dəstək | Tergit.az',
+    metaDescription: 'Alkoqol asılılığının əlamətləri, müalicə yolları, dəstək qrupları haqqında məlumat.',
+    metaKeywords: 'alkoqol asılılığı, alkoqolizm, içki asılılığı, alkoqoldan imtina',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_narkotik', slug: 'narkotik', icon: '💊', title: 'Narkotik Asılılığı',
+    level: 'yuksek', levelLabel: 'YÜKSƏK RİSK',
+    shortDesc: 'Narkotik asılılığı ən ağır asılılıq formasıdır, mütləq peşəkar tibbi müdaxilə tələb edir.',
+    content: 'Narkotik asılılığı beyin strukturunu fiziki olaraq dəyişdirən xroniki, proqressiv bir xəstəlikdir. Narkotiklər — eroin, kokain, metamfetamin, opioidlər — dopamin sistemini normal stimulların onlarla dəfəsi qədər aktivləşdirir.\n\nZamanla beyin artıq normal həzz hiss edə bilmir — yalnız narkotik istifadəsi zamanı "normal" hiss edir. Bu dövr asılılığın ən dərin fazasıdır.\n\nNarkotik asılılığı ilə mübarizə uzunmüddətli, hərtərəfli müalicə tələb edir: detoks, rehabilitasiya, psixoterapiya, dəstək qrupları. Tək başına bu yola çıxmaq son dərəcə çətindir.',
+    tips: [
+      'Dərhal professional yardım alın — həyatınız risk altındadır',
+      'Tibbi detoks proqramına müraciət edin',
+      'Ailənizi bu prosesə cəlb edin',
+      'Rehabilitasiya mərkəzləri haqqında məlumat alın',
+      'Krizis anında 152 nömrəsinə zəng edin'
+    ],
+    metaTitle: 'Narkotik Asılılığı — Kömək və Müalicə | Tergit.az',
+    metaDescription: 'Narkotik asılılığında professional yardım, müalicə mərhələləri və dəstək haqqında məlumat.',
+    metaKeywords: 'narkotik asılılığı, narkomaniya, narkotikdən imtina, rehabilitasiya',
+    heroImage: '', updatedAt: new Date().toISOString()
+  }
+];
+
 async function ensureDataFiles() {
   await fsp.mkdir(DATA_DIR, { recursive: true });
-
-  const DEFAULT_ROBOTS = `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\n\nSitemap: ${SITE_URL}/sitemap.xml`;
+  await fsp.mkdir(UPLOADS_DIR, { recursive: true });
 
   const defaults = {
     [FILES.messages]: emptyArrayFile(),
@@ -119,8 +240,7 @@ async function ensureDataFiles() {
     [FILES.posts]: JSON.stringify(SEED_POSTS, null, 2),
     [FILES.categories]: JSON.stringify(SEED_CATEGORIES, null, 2),
     [FILES.blockedIps]: '{}',
-    [FILES.pages]: emptyArrayFile(),
-    [FILES.robotsTxt]: DEFAULT_ROBOTS
+    [FILES.pages]: JSON.stringify(SEED_PAGES, null, 2)
   };
 
   for (const [filePath, defaultContent] of Object.entries(defaults)) {
@@ -638,24 +758,13 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const metaTitle = sanitizeText(req.body?.metaTitle) || title;
     const metaDescription = sanitizeText(req.body?.metaDescription, { multiline: true });
     const metaKeywords = sanitizeText(req.body?.metaKeywords);
-    const focusKeyword = sanitizeText(req.body?.focusKeyword);
-    const canonicalUrl = sanitizeText(req.body?.canonicalUrl);
-    const robotsMeta = req.body?.robotsMeta === 'noindex' ? 'noindex' : 'index';
-    const inSitemap = req.body?.inSitemap !== false;
     const ogImage = sanitizeText(req.body?.ogImage);
-    const featuredImage = sanitizeText(req.body?.featuredImage);
-    const featuredImageAlt = sanitizeText(req.body?.featuredImageAlt);
-    const useFeaturedAsOg = req.body?.useFeaturedAsOg !== false;
-    const faqs = Array.isArray(req.body?.faqs) ? req.body.faqs : [];
-    const showFaqOnPage = req.body?.showFaqOnPage !== false;
     const published = Boolean(req.body?.published);
 
     if (!title || !content || !categoryId) {
       return failure(res, 'MISSING_FIELDS', 400, 'Başlıq, məzmun və kateqoriya tələb olunur.');
     }
-
-    const finalOgImage = useFeaturedAsOg ? featuredImage : ogImage;
-    if (finalOgImage && !validator.isURL(finalOgImage, { require_protocol: true })) {
+    if (ogImage && !validator.isURL(ogImage, { require_protocol: true })) {
       return failure(res, 'INVALID_URL', 400, 'OG şəkil URL düzgün formatda olmalıdır.');
     }
 
@@ -677,16 +786,23 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const now = new Date().toISOString();
     const newPost = {
       id: generateId('post'),
-      title, slug, categoryId, content,
-      metaTitle, metaDescription, metaKeywords,
-      focusKeyword, canonicalUrl, robotsMeta, inSitemap,
-      ogImage: finalOgImage, featuredImage, featuredImageAlt,
-      useFeaturedAsOg, faqs, showFaqOnPage,
-      published, createdAt: now, updatedAt: now, views: 0
+      title,
+      slug,
+      categoryId,
+      content,
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      ogImage,
+      published,
+      createdAt: now,
+      updatedAt: now,
+      views: 0
     };
 
     posts.push(newPost);
     await writeData(FILES.posts, posts);
+
     return success(res, newPost, 'Məqalə əlavə edildi.', 201);
   } catch (err) {
     console.error(err);
@@ -710,21 +826,14 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
     const metaTitle = req.body?.metaTitle !== undefined ? sanitizeText(req.body.metaTitle) : existing.metaTitle;
     const metaDescription = req.body?.metaDescription !== undefined ? sanitizeText(req.body.metaDescription, { multiline: true }) : existing.metaDescription;
     const metaKeywords = req.body?.metaKeywords !== undefined ? sanitizeText(req.body.metaKeywords) : existing.metaKeywords;
-    const focusKeyword = req.body?.focusKeyword !== undefined ? sanitizeText(req.body.focusKeyword) : existing.focusKeyword;
-    const canonicalUrl = req.body?.canonicalUrl !== undefined ? sanitizeText(req.body.canonicalUrl) : existing.canonicalUrl;
-    const robotsMeta = req.body?.robotsMeta !== undefined ? (req.body.robotsMeta === 'noindex' ? 'noindex' : 'index') : existing.robotsMeta;
-    const inSitemap = req.body?.inSitemap !== undefined ? req.body.inSitemap !== false : existing.inSitemap;
-    const featuredImage = req.body?.featuredImage !== undefined ? sanitizeText(req.body.featuredImage) : existing.featuredImage;
-    const featuredImageAlt = req.body?.featuredImageAlt !== undefined ? sanitizeText(req.body.featuredImageAlt) : existing.featuredImageAlt;
-    const useFeaturedAsOg = req.body?.useFeaturedAsOg !== undefined ? Boolean(req.body.useFeaturedAsOg) : existing.useFeaturedAsOg;
-    const rawOgImage = req.body?.ogImage !== undefined ? sanitizeText(req.body.ogImage) : existing.ogImage;
-    const ogImage = useFeaturedAsOg ? featuredImage : rawOgImage;
-    const faqs = req.body?.faqs !== undefined ? (Array.isArray(req.body.faqs) ? req.body.faqs : []) : (existing.faqs || []);
-    const showFaqOnPage = req.body?.showFaqOnPage !== undefined ? Boolean(req.body.showFaqOnPage) : existing.showFaqOnPage;
+    const ogImage = req.body?.ogImage !== undefined ? sanitizeText(req.body.ogImage) : existing.ogImage;
     const published = req.body?.published !== undefined ? Boolean(req.body.published) : existing.published;
 
     if (!title || !content || !categoryId) {
       return failure(res, 'MISSING_FIELDS', 400, 'Başlıq, məzmun və kateqoriya tələb olunur.');
+    }
+    if (ogImage && !validator.isURL(ogImage, { require_protocol: true })) {
+      return failure(res, 'INVALID_URL', 400, 'OG şəkil URL düzgün formatda olmalıdır.');
     }
     if (!slug) {
       return failure(res, 'INVALID_SLUG', 400, 'Slug boş ola bilməz.');
@@ -742,11 +851,15 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
 
     posts[index] = {
       ...existing,
-      title, content, categoryId, slug,
-      metaTitle, metaDescription, metaKeywords,
-      focusKeyword, canonicalUrl, robotsMeta, inSitemap,
-      ogImage, featuredImage, featuredImageAlt, useFeaturedAsOg,
-      faqs, showFaqOnPage, published,
+      title,
+      content,
+      categoryId,
+      slug,
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      ogImage,
+      published,
       updatedAt: new Date().toISOString()
     };
 
@@ -811,52 +924,54 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
 
 app.get('/sitemap.xml', async (req, res) => {
   try {
-    const [posts, categories] = await Promise.all([
-      readData(FILES.posts),
-      readData(FILES.categories)
-    ]);
-
-    const now = new Date().toISOString().split('T')[0];
+    const posts = await readData(FILES.posts);
+    const publishedPosts = posts.filter((p) => p.published);
 
     const staticUrls = [
-      { loc: '/', priority: '1.0', changefreq: 'daily', lastmod: now },
-      { loc: '/asililiqlar', priority: '0.9', changefreq: 'weekly', lastmod: now },
-      { loc: '/bloq', priority: '0.9', changefreq: 'daily', lastmod: now },
-      { loc: '/elaqe', priority: '0.6', changefreq: 'monthly', lastmod: now }
+      { loc: '/', priority: '1.0', changefreq: 'daily' },
+      { loc: '/asililiqlar', priority: '0.9', changefreq: 'weekly' },
+      { loc: '/bloq', priority: '0.9', changefreq: 'daily' },
+      { loc: '/elaqe', priority: '0.6', changefreq: 'monthly' }
     ];
 
     const urlEntries = staticUrls
-      .map((u) => `  <url>
+      .map(
+        (u) => `  <url>
     <loc>${SITE_URL}${u.loc}</loc>
-    <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
-  </url>`).join('\n');
+  </url>`
+      )
+      .join('\n');
 
-    // Yalnız dərc olunmuş və inSitemap:false olmayan məqalələr
-    const publishedPosts = posts.filter((p) => p.published && p.inSitemap !== false);
     const postEntries = publishedPosts
-      .map((p) => `  <url>
+      .map(
+        (p) => `  <url>
     <loc>${SITE_URL}/bloq/${p.slug}</loc>
-    <lastmod>${(p.updatedAt || p.createdAt || now).split('T')[0]}</lastmod>
+    <lastmod>${p.updatedAt.split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-  </url>`).join('\n');
+  </url>`
+      )
+      .join('\n');
 
-    // Kateqoriyalar
-    const catEntries = categories
-      .map((c) => `  <url>
-    <loc>${SITE_URL}/bloq?cat=${c.slug}</loc>
-    <lastmod>${(c.updatedAt || c.createdAt || now).split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`).join('\n');
+    const pages = await readData(FILES.pages);
+    const pageEntries = pages
+      .map(
+        (p) => `  <url>
+    <loc>${SITE_URL}/asililiqlar/${p.slug}</loc>
+    <lastmod>${p.updatedAt.split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`
+      )
+      .join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urlEntries}
 ${postEntries}
-${catEntries}
+${pageEntries}
 </urlset>`;
 
     res.header('Content-Type', 'application/xml');
@@ -867,104 +982,118 @@ ${catEntries}
   }
 });
 
-app.get('/robots.txt', async (req, res) => {
+/* ============================================================
+   UPLOADS — Statik fayl xidməti
+   ============================================================ */
+
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+/* ============================================================
+   UPLOAD API — Şəkil yükləmə
+   ============================================================ */
+
+app.post('/api/upload', authenticateToken, async (req, res) => {
   try {
-    const content = await fsp.readFile(FILES.robotsTxt, 'utf-8');
-    res.header('Content-Type', 'text/plain');
-    return res.send(content);
-  } catch {
-    res.header('Content-Type', 'text/plain');
-    return res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\n\nSitemap: ${SITE_URL}/sitemap.xml`);
+    // Base64 şəkil qəbul edir: { name, data, type }
+    const { name, data, type } = req.body || {};
+
+    if (!data || !type) {
+      return failure(res, 'MISSING_DATA', 400, 'Fayl adı, məlumatı və növü tələb olunur.');
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(type)) {
+      return failure(res, 'INVALID_TYPE', 400, 'Yalnız JPEG, PNG, WebP və GIF formatları dəstəklənir.');
+    }
+
+    const ext = type.split('/')[1].replace('jpeg', 'jpg');
+    const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const filePath = path.join(UPLOADS_DIR, fileName);
+
+    // Base64-dən buffer-ə çevir
+    const base64Data = data.replace(/^data:[^;]+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Ölçü yoxlaması (maks. 5MB)
+    if (buffer.length > 5 * 1024 * 1024) {
+      return failure(res, 'FILE_TOO_LARGE', 400, 'Fayl ölçüsü 5MB-dan çox ola bilməz.');
+    }
+
+    await fsp.writeFile(filePath, buffer);
+
+    const url = `${SITE_URL}/uploads/${fileName}`;
+    return success(res, { url, fileName }, 'Şəkil uğurla yükləndi.');
+  } catch (err) {
+    console.error('[UPLOAD XƏTASI]', err);
+    return failure(res, 'UPLOAD_ERROR', 500, 'Şəkil yüklənərkən xəta baş verdi.');
   }
 });
 
 /* ============================================================
-   ROUTES — SƏHİFƏ İDARƏSİ
+   PAGES API — Asılılıq səhifələri
    ============================================================ */
 
-app.get('/api/pages', authenticateToken, async (req, res) => {
+// GET /api/pages — Bütün səhifələr (açıq)
+app.get('/api/pages', async (req, res) => {
   try {
     const pages = await readData(FILES.pages);
-    return success(res, pages, 'Səhifələr gətirildi.');
+    return success(res, pages);
   } catch (err) {
-    return failure(res, 'SERVER_ERROR', 500, 'Səhifələr yüklənə bilmədi.');
+    return failure(res, 'SERVER_ERROR', 500);
   }
 });
 
-app.post('/api/pages', authenticateToken, async (req, res) => {
+// GET /api/pages/:slug — Tək səhifə (açıq)
+app.get('/api/pages/:slug', async (req, res) => {
   try {
-    const { title, slug, content, active, showInMenu, menuOrder, featuredImage, metaTitle, metaDescription, canonicalUrl, robotsMeta, inSitemap, ogImage, ogTitle, ogDescription } = req.body;
-    if (!title?.trim() || !slug?.trim()) return failure(res, 'VALIDATION', 400, 'Başlıq və slug tələb olunur.');
     const pages = await readData(FILES.pages);
-    if (pages.find((p) => p.slug === slug.trim())) return failure(res, 'DUPLICATE', 409, 'Bu slug artıq mövcuddur.');
-    const page = {
-      id: `page_${Date.now()}`,
-      title: title.trim(), slug: slug.trim(), content: content || '',
-      active: active !== false, showInMenu: showInMenu !== false,
-      menuOrder: parseInt(menuOrder) || 0,
-      featuredImage: featuredImage || '', metaTitle: metaTitle || '',
-      metaDescription: metaDescription || '', canonicalUrl: canonicalUrl || '',
-      robotsMeta: robotsMeta || 'index', inSitemap: inSitemap !== false,
-      ogImage: ogImage || '', ogTitle: ogTitle || '', ogDescription: ogDescription || '',
-      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-    };
-    pages.push(page);
-    await writeData(FILES.pages, pages);
-    return success(res, page, 'Səhifə əlavə edildi.');
+    const page = pages.find((p) => p.slug === req.params.slug);
+    if (!page) return failure(res, 'NOT_FOUND', 404, 'Səhifə tapılmadı.');
+    return success(res, page);
   } catch (err) {
-    return failure(res, 'SERVER_ERROR', 500, 'Səhifə əlavə edilə bilmədi.');
+    return failure(res, 'SERVER_ERROR', 500);
   }
 });
 
+// PUT /api/pages/:id — Səhifəni yenilə (JWT)
 app.put('/api/pages/:id', authenticateToken, async (req, res) => {
   try {
     const pages = await readData(FILES.pages);
     const idx = pages.findIndex((p) => p.id === req.params.id);
     if (idx === -1) return failure(res, 'NOT_FOUND', 404, 'Səhifə tapılmadı.');
-    pages[idx] = { ...pages[idx], ...req.body, id: pages[idx].id, updatedAt: new Date().toISOString() };
+
+    const allowed = ['title', 'shortDesc', 'content', 'tips', 'heroImage',
+                     'metaTitle', 'metaDescription', 'metaKeywords'];
+    const updates = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) {
+        if (key === 'tips') {
+          updates[key] = Array.isArray(req.body[key]) ? req.body[key].map((t) => sanitizeText(t)) : [];
+        } else {
+          updates[key] = sanitizeText(req.body[key], { multiline: key === 'content' });
+        }
+      }
+    }
+
+    pages[idx] = { ...pages[idx], ...updates, updatedAt: new Date().toISOString() };
     await writeData(FILES.pages, pages);
+
     return success(res, pages[idx], 'Səhifə yeniləndi.');
   } catch (err) {
-    return failure(res, 'SERVER_ERROR', 500, 'Səhifə yenilənə bilmədi.');
+    return failure(res, 'SERVER_ERROR', 500);
   }
 });
 
-app.delete('/api/pages/:id', authenticateToken, async (req, res) => {
-  try {
-    const pages = await readData(FILES.pages);
-    const filtered = pages.filter((p) => p.id !== req.params.id);
-    if (filtered.length === pages.length) return failure(res, 'NOT_FOUND', 404, 'Səhifə tapılmadı.');
-    await writeData(FILES.pages, filtered);
-    return success(res, null, 'Səhifə silindi.');
-  } catch (err) {
-    return failure(res, 'SERVER_ERROR', 500, 'Səhifə silinə bilmədi.');
-  }
+app.get('/robots.txt', (req, res) => {
+  const content = `User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+Sitemap: ${SITE_URL}/sitemap.xml`;
+  res.header('Content-Type', 'text/plain');
+  return res.send(content);
 });
-
-/* ============================================================
-   SEO: ROBOTS.TXT ADMIN API
-   ============================================================ */
-
-app.get('/api/seo/robots', authenticateToken, async (req, res) => {
-  try {
-    const content = await fsp.readFile(FILES.robotsTxt, 'utf-8');
-    return success(res, { content }, 'robots.txt oxundu.');
-  } catch {
-    return failure(res, 'NOT_FOUND', 404, 'robots.txt tapılmadı.');
-  }
-});
-
-app.put('/api/seo/robots', authenticateToken, async (req, res) => {
-  try {
-    const { content } = req.body;
-    if (typeof content !== 'string') return failure(res, 'MISSING', 400, 'Məzmun tələb olunur.');
-    await fsp.writeFile(FILES.robotsTxt, content, 'utf-8');
-    return success(res, { content }, 'robots.txt saxlanıldı.');
-  } catch (err) {
-    return failure(res, 'SERVER_ERROR', 500, 'Server xətası.');
-  }
-});
-
 
 /* ============================================================
    PRODUCTION: REACT BUILD-İNİ TƏQDİM ET
@@ -973,6 +1102,7 @@ app.put('/api/seo/robots', authenticateToken, async (req, res) => {
 const distPath = path.join(__dirname, 'dist');
 if (NODE_ENV === 'production' && fs.existsSync(distPath)) {
   app.use(express.static(distPath));
+  app.use('/uploads', express.static(UPLOADS_DIR));
   app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
