@@ -274,20 +274,16 @@ const LEVEL_LABELS = { yuksek: 'Yüksək', orta: 'Orta', asagi: 'Aşağı' };
 
 function AddictionCard({ addiction }) {
   const [open, setOpen] = useState(false);
-  const levelColors = { yuksek: '#F85149', orta: '#FFB703', asagi: '#3FB950' };
-  const levelBg = { yuksek: 'rgba(248,81,73,0.08)', orta: 'rgba(255,183,3,0.08)', asagi: 'rgba(63,185,80,0.08)' };
   return (
-    <div className="addiction-card" style={{ borderTop: `3px solid ${levelColors[addiction.level]}` }}>
+    <div className="addiction-card">
       <div className="addiction-card__top">
         <div className="addiction-card__icon" aria-hidden="true">{addiction.icon}</div>
-        <span className={`level-pill level-${addiction.level}`} style={{ background: levelBg[addiction.level], color: levelColors[addiction.level] }}>
-          {LEVEL_LABELS[addiction.level]} risk
-        </span>
+        <span className={`level-pill level-${addiction.level}`}>{LEVEL_LABELS[addiction.level]} risk</span>
       </div>
       <h3>{addiction.name}</h3>
       <p>{addiction.description}</p>
       <button className="addiction-card__toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        {open ? '▲ Gizlət' : '▼ Məsləhətlər göstər'}
+        {open ? '▲ Məsləhətləri gizlət' : '▼ Məsləhətlər'}
       </button>
       {open && (
         <ul className="addiction-card__tips">
@@ -319,7 +315,7 @@ function Header() {
       <div className="container site-header__inner">
         <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
           <img src="/logo.png" alt="Tergit.az logo" className="brand-logo" />
-          <span style={{ letterSpacing: '0.12em' }}>TERGIT<span style={{ color: 'var(--accent)' }}>.AZ</span></span>
+          Tergit<span style={{ color: 'var(--accent)' }}>.az</span>
         </Link>
 
         <nav className="nav-links" aria-label="Əsas naviqasiya">
@@ -448,90 +444,12 @@ const SIGNS = [
 ];
 
 const ADDICTION_TYPES_EXT = [
-  {
-    id: 'qumar',
-    name: 'Qumar',
-    icon: '🎰',
-    level: 'yuksek',
-    description: 'Kumar, beyin ödül sistemini maddə kimi stimullaşdırır. Maliyyə böhranına, ailə problemlərinə səbəb olur.',
-    tips: [
-      'Kumar saytlarını və tətbiqlərini telefonundan silin',
-      'Maliyyə hesablarınıza giriş imkanını məhdudlaşdırın',
-      'Oyun salonlarından uzaq marşrutlar seçin',
-      'Mütəxəssis dəstəyi və qumarbazlar anonim qrupuna müraciət edin',
-      'Boş vaxtı idman və ya hobbi ilə doldurun'
-    ]
-  },
-  {
-    id: 'internet',
-    name: 'Texnologiya / İnternet',
-    icon: '💻',
-    level: 'orta',
-    description: 'Sosial media, oyun, internet asılılığı xüsusilə gənclər arasında sürətlə artır. Real həyatdan uzaqlaşma ciddi nəticələr verir.',
-    tips: [
-      'Gündəlik ekran vaxtı limitini tətbiq parametrlərindən təyin edin',
-      'Gecə 22:00-dan sonra cihazları başqa otaqda saxlayın',
-      'İnternetdən azad günlər — tam "offline" günlər planlayın',
-      'Real həyatda ictimai fəaliyyətlərə qatılın',
-      'Rəqəmsal detoks proqramlarından istifadə edin'
-    ]
-  },
-  {
-    id: 'yemek',
-    name: 'Yemək / Qida asılılığı',
-    icon: '🍔',
-    level: 'orta',
-    description: 'Şəkər, yağlı qidalar beyin dopamin sistemini aktivləşdirir. Kompulsiv yemək davranışı cismani və psixoloji problemlər yaradır.',
-    tips: [
-      'Emosional yemə vərdişini gündəlik qeydlə izləyin',
-      'Evdə sağlam qida seçimlərini hazır saxlayın',
-      'Yemək vaxtı ekranı söndürün, diqqətli yeyin',
-      'Dietoloq və ya psixoloqla məsləhətləşin',
-      'Stress anlarında yemək əvəzinə hərəkət edin'
-    ]
-  },
-  {
-    id: 'idman',
-    name: 'İdman / Egzersiz asılılığı',
-    icon: '💪',
-    level: 'asagi',
-    description: 'Həddindən artıq məşq endorfin asılılığına çevrilə bilər. Travma, zədə və sosial izolyasiyaya yol aça bilər.',
-    tips: [
-      'Həftəlik məşq cədvəlinə istirahət günləri əlavə edin',
-      'Bədəninizin verdiyı yorğunluq siqnallarına qulaq asın',
-      'İdman məqsədlərini sağlamlıq üzərindən qurun, obsessiya üzərindən yox',
-      'Sosial idman fəaliyyətlərini seçin',
-      'Məşq gündəliyini mütəxəssislə birlikdə izləyin'
-    ]
-  },
-  {
-    id: 'alisveris',
-    name: 'Alış-veriş asılılığı',
-    icon: '🛍️',
-    level: 'orta',
-    description: 'Kompulsiv alış-veriş emosional boşluğu doldurmaq cəhdidir. Ciddi maliyyə böhranına gətirib çıxarır.',
-    tips: [
-      'Alış-veriş öncəsi 24 saat gözləmə qaydası tətbiq edin',
-      'Kredit kartını evdə buraxın, nağd pul limitləyin',
-      'Alış-veriş tətbiqlərini silin, bildirişləri söndürün',
-      'Maliyyə vəziyyətinizi aylıq izləyin',
-      'Emosional alış-verişin arxasındakı hissi müəyyən edin'
-    ]
-  },
-  {
-    id: 'munasibetler',
-    name: 'Münasibət / Sevgi asılılığı',
-    icon: '❤️',
-    level: 'orta',
-    description: 'Kodependensiya real münasibətdir. İnsanlar başqaları vasitəsilə öz dəyərlərini axtarırlar, bu isə tükenmişliyə yol açır.',
-    tips: [
-      'Özünüzə aid fəaliyyət və maraqlar inkişaf etdirin',
-      'Münasibətdə şəxsi sərhədlərinizi müəyyən edin',
-      'Terapevtlə kodependensiya üzərinə işləyin',
-      'Özünü sevmə praktikalarını gündəlik həyata keçirin',
-      'Dəstək qruplarına qatılın'
-    ]
-  },
+  { icon: '🎰', bg: '#EEF2FF', title: 'Qumar asılılığı', desc: 'Kumar, beyin ödül sistemini maddə kimi stimullaşdırır. Maliyyə böhranına, ailə problemlərinə səbəb olur.', tags: [{ label: 'Davranış asılılığı', cls: 'tag-blue' }, { label: 'Maliyyə riski', cls: 'tag-amber' }] },
+  { icon: '📱', bg: '#F5F3FF', title: 'Texnologiya / İnternet', desc: 'Sosial media, oyun, internet asılılığı xüsusilə gənclər arasında sürətlə artır. Real həyatdan uzaqlaşma ciddi nəticələr verir.', tags: [{ label: 'Müasir asılılıq', cls: 'tag-purple' }, { label: 'Proqramlar mövcud', cls: 'tag-green' }] },
+  { icon: '🍔', bg: '#FFF1F2', title: 'Yemək / Qida asılılığı', desc: 'Şəkər, yağlı qidalar beyin dopamin sistemini aktivləşdirir. Kompulsiv yemək davranışı cismani və psixoloji problemlər yaradır.', tags: [{ label: 'Davranış', cls: 'tag-coral' }, { label: 'Terapiya effektivdir', cls: 'tag-blue' }] },
+  { icon: '💪', bg: '#ECFDF5', title: 'İdman / Egzersiz asılılığı', desc: 'Həddindən artıq məşq endorfin asılılığına çevrilə bilər. Travma, zədə və sosial izolyasiyaya yol aça bilər.', tags: [{ label: 'Az tanınan', cls: 'tag-green' }, { label: 'Diqqət tələb edir', cls: 'tag-amber' }] },
+  { icon: '🛍️', bg: '#FEF9C3', title: 'Alış-veriş asılılığı', desc: 'Kompulsiv alış-veriş emosional boşluğu doldurmaq cəhdidir. Ciddi maliyyə böhranına gətirib çıxarır.', tags: [{ label: 'Maliyyə', cls: 'tag-amber' }, { label: 'Psixoloji köklər', cls: 'tag-purple' }] },
+  { icon: '❤️', bg: '#F0F9FF', title: 'Münasibət / Sevgi asılılığı', desc: 'Kodependensiya real münasibətdir. İnsanlar başqaları vasitəsilə öz dəyərlərini axtarırlar, bu isə tükenmişliyə yol açır.', tags: [{ label: 'Emosional', cls: 'tag-coral' }, { label: 'Terapiya vacibdir', cls: 'tag-blue' }] },
 ];
 
 function QuizWidget() {
@@ -608,7 +526,12 @@ function DayTracker() {
         <p>Asılılığı nə vaxt tərk etdin?</p>
       </div>
       <div className="home-tracker__form">
-        <select value={type} onChange={(e) => setType(e.target.value)} className="home-tracker__select">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="home-tracker__select"
+          aria-label="Asılılıq növü seçin"
+        >
           <option value="sosial-media">📱 Sosial Media</option>
           <option value="oyun">🎮 Oyun</option>
           <option value="siqaret">🚬 Siqaret</option>
@@ -624,6 +547,7 @@ function DayTracker() {
             onChange={(e) => { setDate(e.target.value); setDays(null); }}
             className="home-tracker__input"
             max={new Date().toISOString().split('T')[0]}
+            aria-label="Asılılığı tərk etdiyiniz tarix"
           />
           <button className="btn btn-primary btn-sm" onClick={calc}>Hesabla</button>
         </div>
@@ -675,21 +599,21 @@ function HomePage() {
               mübarizədə sənə praktiki məsləhətlər, real bilgi və dəstək təklif edir.
             </p>
             <div className="home-hero__btns">
-              <Link to="/asililiqlar" className="btn btn-primary">Asılılıqları kəşf et →</Link>
+              <Link to="/asililiqlar" className="btn btn-primary">7 asılılığı kəşf et →</Link>
               <Link to="/bloq" className="btn btn-ghost">Bloqu oxu</Link>
             </div>
             <div className="home-hero__stats">
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">500+</span>
-                <span className="home-hero__stat-lbl">Praktiki məsləhət</span>
+                <span className="home-hero__stat-num">7</span>
+                <span className="home-hero__stat-lbl">Asılılıq növü</span>
               </div>
               <div className="home-hero__stat">
                 <span className="home-hero__stat-num">100%</span>
                 <span className="home-hero__stat-lbl">Pulsuz məlumat</span>
               </div>
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">5000+</span>
-                <span className="home-hero__stat-lbl">Aktiv oxucu</span>
+                <span className="home-hero__stat-num">24/7</span>
+                <span className="home-hero__stat-lbl">Onlayn dəstək</span>
               </div>
             </div>
           </div>
@@ -720,35 +644,49 @@ function HomePage() {
           <h2 className="home-section__title">Hansı asılılıqla mübarizə aparırsan?</h2>
           <p className="home-section__sub">Hər kateqoriya üçün konkret, tətbiq edilə bilən məsləhətlər hazırladıq.</p>
           <div className="home-types-grid">
-            {[
-              [...ADDICTIONS, ...ADDICTION_TYPES_EXT].find(a => a.id === 'siqaret'),
-              [...ADDICTIONS, ...ADDICTION_TYPES_EXT].find(a => a.id === 'alkoqol'),
-              [...ADDICTIONS, ...ADDICTION_TYPES_EXT].find(a => a.id === 'qumar'),
-            ].filter(Boolean).map((a) => (
+            {ADDICTIONS.map((a) => (
               <AddictionCard key={a.id} addiction={a} />
             ))}
           </div>
+          <div className="home-types-grid" style={{ marginTop: 24 }}>
+            {ADDICTION_TYPES_EXT.map((t, i) => (
+              <div key={i} className="home-type-card">
+                <div className="home-type-icon" style={{ background: t.bg }}>{t.icon}</div>
+                <h3>{t.title}</h3>
+                <p>{t.desc}</p>
+                <div className="home-type-tags">
+                  {t.tags.map((tg, j) => (
+                    <span key={j} className={`home-tag ${tg.cls}`}>{tg.label}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <Link to="/asililiqlar" className="btn btn-ghost">Bütün asılılıqları gör →</Link>
+            <Link to="/asililiqlar" className="btn btn-ghost">Bütün asılılıqları gör</Link>
           </div>
         </div>
       </section>
 
+      {/* ── ƏLAMƏTLƏr + TEST ── */}
       <section className="home-section">
         <div className="container">
-          <div className="home-section__label">Əlamətlər</div>
+          <div className="home-section__label">Əlamətlər və test</div>
           <h2 className="home-section__title">Asılılığın əlamətlərini tanı</h2>
           <p className="home-section__sub">Erkən tanıma — erkən müalicə. Bu əlamətlərdən biri sənə tanış gəlirsə, kömək almağı düşün.</p>
-          <div className="home-signs-list" style={{ marginTop: 40 }}>
-            {SIGNS.map((s, i) => (
-              <div key={i} className="home-sign-item">
-                <div className="home-sign-num">{i + 1}</div>
-                <div>
-                  <div className="home-sign-title">{s.title}</div>
-                  <div className="home-sign-desc">{s.desc}</div>
+          <div className="home-signs-layout">
+            <div className="home-signs-list">
+              {SIGNS.map((s, i) => (
+                <div key={i} className="home-sign-item">
+                  <div className="home-sign-num">{i + 1}</div>
+                  <div>
+                    <div className="home-sign-title">{s.title}</div>
+                    <div className="home-sign-desc">{s.desc}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <QuizWidget />
           </div>
         </div>
       </section>
@@ -800,27 +738,28 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ── SOSİAL MEDİA ── */}
+      {/* ── KƏMƏk XƏTTI ── */}
       <section className="home-section home-section--darkblue">
         <div className="container" style={{ textAlign: 'center' }}>
-          <div className="home-section__label home-section__label--light">Sosial media</div>
-          <h2 className="home-section__title home-section__title--light">Bizi izləyin</h2>
+          <div className="home-section__label home-section__label--light">Kömək xətti</div>
+          <h2 className="home-section__title home-section__title--light">Kömək almaq güc əlamətidir</h2>
           <p className="home-section__sub home-section__sub--light" style={{ margin: '0 auto 48px' }}>
-            Tergit.az-ı sosial mediada izləyin, yeni məqalələr və məsləhətlərdən ilk siz xəbərdar olun.
+            Əgər özün üçün yardıma ehtiyacın varsa, lütfən müraciət et. Bir addım ataraq hər şeyi dəyişdirə bilərsən.
           </p>
           <div className="home-hotline-cards">
-            <a href="https://www.instagram.com/tergit.az" target="_blank" rel="noopener noreferrer" className="home-hotline-card" style={{ textDecoration: 'none' }}>
-              <div className="home-hotline-icon">📸</div>
-              <h4>Instagram</h4>
-              <p>Faydalı məsləhətlər, motivasiya yazıları və yeniliklər üçün bizi izləyin.</p>
-              <div className="home-hotline-num" style={{ fontSize: 16 }}>@tergit.az</div>
-            </a>
-            <a href="https://www.tiktok.com/@tergit.az" target="_blank" rel="noopener noreferrer" className="home-hotline-card" style={{ textDecoration: 'none' }}>
-              <div className="home-hotline-icon">🎵</div>
-              <h4>TikTok</h4>
-              <p>Qısa və maraqlı videolarla asılılıq haqqında bilgilər əldə edin.</p>
-              <div className="home-hotline-num" style={{ fontSize: 16 }}>@tergit.az</div>
-            </a>
+            {[
+              { icon: '📞', title: 'Xüsusi yardım xətti', desc: 'Azərbaycan Respublikasında narkologiya yardım xətti', num: '152', avail: '24/7 pulsuz' },
+              { icon: '🏥', title: 'Narkologiya Mərkəzi', desc: 'Bakı Narkologiya Mərkəzinə müraciət et', num: '012 595 30 05', avail: 'İş günləri' },
+              { icon: '💬', title: 'Psixoloji dəstək', desc: 'Psixoloji Sağlamlıq Mərkəzi ilə əlaqə', num: '012 492 92 10', avail: 'Həftəiçi' },
+            ].map((h, i) => (
+              <div key={i} className="home-hotline-card">
+                <div className="home-hotline-icon">{h.icon}</div>
+                <h4>{h.title}</h4>
+                <p>{h.desc}</p>
+                <div className="home-hotline-num">{h.num}</div>
+                <div className="home-hotline-avail">{h.avail}</div>
+              </div>
+            ))}
           </div>
           <div style={{ marginTop: 40 }}>
             <Link to="/elaqe" className="btn btn-primary">Bizə yazın →</Link>
@@ -838,11 +777,9 @@ function HomePage() {
 function AddictionsPage() {
   const [filter, setFilter] = useState('hamisi');
 
-  const allAddictions = [...ADDICTIONS, ...ADDICTION_TYPES_EXT];
-
   const filtered = useMemo(() => {
-    if (filter === 'hamisi') return allAddictions;
-    return allAddictions.filter((a) => a.level === filter);
+    if (filter === 'hamisi') return ADDICTIONS;
+    return ADDICTIONS.filter((a) => a.level === filter);
   }, [filter]);
 
   const filters = [
@@ -855,7 +792,7 @@ function AddictionsPage() {
   return (
     <div className="page-enter">
       <SEO
-        title="Asılılıqlar — Növlər və Məsləhətlər"
+        title="Asılılıqlar — 7 Növ və Məsləhətlər"
         description="Sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılığı haqqında məlumat və praktiki məsləhətlər."
         keywords="asılılıq növləri, sosial media asılılığı, oyun asılılığı, siqaret, kofein, fast food, alkoqol, narkotik"
         path="/asililiqlar"
@@ -865,7 +802,7 @@ function AddictionsPage() {
         <div className="container">
           <div className="section-head">
             <span className="section-head__eyebrow">Asılılıqlar</span>
-            <h2>Əsas asılılıq növləri</h2>
+            <h2>7 əsas asılılıq növü</h2>
             <p>Risk səviyyəsinə görə filtrlə və hər biri üçün konkret məsləhətlərə bax.</p>
           </div>
 
@@ -898,23 +835,19 @@ function AddictionsPage() {
 
 function PostCard({ post, category }) {
   const excerpt = post.content.split('\n')[0].slice(0, 130);
-  const date = new Date(post.createdAt);
-  const formattedDate = `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}.${date.getFullYear()}`;
   return (
     <Link to={`/bloq/${post.slug}`} className="post-card">
-      {(post.featuredImage || post.ogImage) && (
-        <img className="post-card__image" src={post.featuredImage || post.ogImage} alt={post.featuredImageAlt || post.title} loading="lazy" />
-      )}
+      {post.ogImage && <img className="post-card__image" src={post.ogImage} alt={post.title} loading="lazy" />}
       <div className="post-card__body">
         {category && (
           <span className="post-card__cat" style={{ background: `${category.color}22`, color: category.color }}>
             {category.name}
           </span>
         )}
-        <h3 className="post-card__title" style={{ color: '#1a1a1a', fontWeight: 800 }}>{post.title}</h3>
-        <p className="post-card__excerpt" style={{ color: '#4B5563' }}>{excerpt}{post.content.length > 130 ? '…' : ''}</p>
+        <h3 className="post-card__title">{post.title}</h3>
+        <p className="post-card__excerpt">{excerpt}{post.content.length > 130 ? '…' : ''}</p>
         <div className="post-card__meta">
-          <span>{formattedDate}</span>
+          <span>{new Date(post.createdAt).toLocaleDateString('az-AZ')}</span>
           <span>· {post.views || 0} baxış</span>
         </div>
       </div>
@@ -1025,31 +958,6 @@ function BlogListPage() {
    BLOG POST PAGE
    ============================================================ */
 
-function FaqItem({ faq }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ background: '#fff', border: '1px solid #E0E0E0', borderRadius: 10, overflow: 'hidden' }}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        style={{
-          width: '100%', textAlign: 'left', padding: '16px 20px',
-          background: 'transparent', border: 'none', cursor: 'pointer',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          fontWeight: 700, fontSize: 15, color: '#1a1a1a'
-        }}
-      >
-        {faq.q}
-        <span style={{ fontSize: 18, color: 'var(--accent)', marginLeft: 12, flexShrink: 0 }}>{open ? '−' : '+'}</span>
-      </button>
-      {open && (
-        <div style={{ padding: '0 20px 16px', fontSize: 15, color: '#555E63', lineHeight: 1.7 }}>
-          {faq.a}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function BlogPostPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -1123,34 +1031,17 @@ function BlogPostPage() {
 
       <article className="section">
         <div className="container post-detail">
-          {(post.featuredImage || post.ogImage) && (
-            <img
-              className="post-detail__cover"
-              src={post.featuredImage || post.ogImage}
-              alt={post.featuredImageAlt || post.title}
-            />
-          )}
-          <h1 style={{ color: '#1a1a1a', fontWeight: 800 }}>{post.title}</h1>
+          {post.ogImage && <img className="post-detail__cover" src={post.ogImage} alt={post.title} />}
+          <h1>{post.title}</h1>
           <div className="post-detail__meta">
-            <span>{(() => { const d = new Date(post.createdAt); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; })()}</span>
+            <span>{new Date(post.createdAt).toLocaleDateString('az-AZ', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
             <span>· {post.views || 0} baxış</span>
           </div>
           <div className="post-detail__content">
             {post.content.split('\n').filter(Boolean).map((para, i) => (
-              <p key={i} style={{ color: '#1a1a1a' }}>{para}</p>
+              <p key={i}>{para}</p>
             ))}
           </div>
-
-          {post.faqs && post.faqs.length > 0 && post.showFaqOnPage !== false && (
-            <div className="post-faq" style={{ marginTop: 48 }}>
-              <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: 22, marginBottom: 20 }}>Tez-tez verilən suallar</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {post.faqs.map((faq, i) => (
-                  <FaqItem key={i} faq={faq} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </article>
     </div>
@@ -1162,10 +1053,10 @@ function BlogPostPage() {
    ============================================================ */
 
 function ContactPage() {
+  const { addToast } = useToast();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [sent, setSent] = useState(false);
 
   function validate() {
     const errors = {};
@@ -1192,12 +1083,13 @@ function ContactPage() {
       });
       const json = await res.json();
       if (json.success) {
-        setSent(true);
+        addToast(json.message || 'Mesajınız göndərildi.', 'success');
+        setForm({ name: '', email: '', message: '' });
       } else {
-        setFieldErrors({ general: json.message || 'Mesaj göndərilə bilmədi.' });
+        addToast(json.message || 'Mesaj göndərilə bilmədi.', 'error');
       }
     } catch {
-      setFieldErrors({ general: 'Server ilə əlaqə qurulmadı.' });
+      addToast('Server ilə əlaqə qurulmadı.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -1209,39 +1101,6 @@ function ContactPage() {
     name: 'Tergit.az ilə əlaqə',
     url: `${SITE_URL}/elaqe`
   };
-
-  if (sent) {
-    return (
-      <div className="page-enter">
-        <SEO title="Mesaj göndərildi" path="/elaqe" noindex />
-        <section className="section">
-          <div className="container" style={{ maxWidth: 560, textAlign: 'center', padding: '60px 24px' }}>
-            <div style={{
-              width: 90, height: 90, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1D9E75, #3FB950)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 28px', fontSize: 40, boxShadow: '0 12px 40px rgba(29,158,117,0.3)'
-            }}>✓</div>
-            <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(26px,5vw,38px)', color: '#1a1a1a', marginBottom: 16 }}>
-              Mesajınız göndərildi!
-            </h1>
-            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.8, marginBottom: 36 }}>
-              Müraciətiniz üçün təşəkkür edirik. Tezliklə sizinlə əlaqə saxlayacağıq.
-            </p>
-            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button
-                className="btn btn-ghost"
-                onClick={() => { setSent(false); setForm({ name: '', email: '', message: '' }); }}
-              >
-                Yeni mesaj göndər
-              </button>
-              <Link to="/" className="btn btn-primary">Ana səhifəyə qayıt →</Link>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
 
   return (
     <div className="page-enter">
@@ -1261,7 +1120,9 @@ function ContactPage() {
             <p>Sualların, təklifin və ya dəstək ehtiyacın varsa, aşağıdaki formu doldur.</p>
           </div>
 
-          {fieldErrors.general && <div className="error-banner">{fieldErrors.general}</div>}
+          <div style={{ marginBottom: 24 }}>
+            <StatusBadge />
+          </div>
 
           <form className="form-card" onSubmit={handleSubmit}>
             <div className="field">
