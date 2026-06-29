@@ -1492,3 +1492,104 @@ tr:last-child td {
   .home-hero__stats { grid-template-columns: repeat(3,1fr); }
   .home-path-steps { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   ASİLİLIQ DETAIL SƏHİFƏSİ
+   ============================================================ */
+
+.addiction-detail-hero {
+  background: linear-gradient(135deg, #f0f9f4 0%, #e8f5fd 100%);
+  padding: 100px 0 60px;
+  border-bottom: 1px solid var(--border);
+}
+
+.addiction-detail-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600; color: var(--accent);
+  margin-bottom: 28px;
+  transition: opacity 0.2s;
+}
+.addiction-detail-back:hover { opacity: 0.7; }
+
+.addiction-detail-hero__inner {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 40px;
+}
+
+.addiction-detail-hero__title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 800; color: var(--text-dark);
+  line-height: 1.15; margin-bottom: 16px;
+}
+
+.addiction-detail-hero__sub {
+  font-size: 17px; color: var(--muted);
+  max-width: 560px; line-height: 1.8;
+}
+
+.addiction-detail-hero__img {
+  width: 280px; height: 200px;
+  object-fit: cover; border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.addiction-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 60px; align-items: start;
+  padding-top: 50px; padding-bottom: 50px;
+}
+
+.addiction-detail-content h2 {
+  font-size: 22px; font-weight: 700;
+  color: var(--text-dark); margin-bottom: 20px;
+}
+
+.addiction-detail-content p {
+  font-size: 16px; color: var(--text);
+  line-height: 1.9; margin-bottom: 16px;
+}
+
+.addiction-detail-tips {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px;
+  position: sticky; top: 90px;
+}
+
+.addiction-detail-tips h3 {
+  font-size: 18px; font-weight: 700;
+  color: var(--text-dark); margin-bottom: 18px;
+}
+
+.addiction-detail-tips__list {
+  padding-left: 20px; margin: 0;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.addiction-detail-tips__list li {
+  font-size: 14px; color: var(--text); line-height: 1.7;
+}
+
+.addiction-mini-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; padding: 20px; text-align: center;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 12px; cursor: pointer;
+  transition: all 0.2s; font-size: 13px; font-weight: 600;
+  color: var(--text-dark); text-decoration: none;
+}
+.addiction-mini-card:hover {
+  border-color: var(--accent); transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+.addiction-mini-card span:first-child { font-size: 28px; }
+
+@media (max-width: 900px) {
+  .addiction-detail-layout { grid-template-columns: 1fr; gap: 30px; }
+  .addiction-detail-tips { position: static; }
+  .addiction-detail-hero__img { display: none; }
+  .addiction-detail-hero { padding: 80px 16px 40px; }
+}
