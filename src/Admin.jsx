@@ -1337,19 +1337,32 @@ function PagesPanel({ token, onAuthError }) {
             {!loading && pages.map((p) => (
               <tr key={p.id}>
                 <td style={{ fontSize: 22 }}>{p.icon}</td>
-                <td><strong>{p.title}</strong></td>
-                <td><code style={{ fontSize: 12 }}>/asililiqlar/{p.slug}</code></td>
                 <td>
-                  <span className={`tag-pill ${p.level === 'yuksek' ? 'pill-danger' : p.level === 'orta' ? 'pill-muted' : 'pill-success'}`}>
-                    {p.levelLabel || p.level}
-                  </span>
+                  <strong>{p.title}</strong>
+                  {p.type === 'static' && (
+                    <span className="tag-pill pill-muted" style={{ marginLeft: 8, fontSize: 10 }}>Statik</span>
+                  )}
+                </td>
+                <td>
+                  <code style={{ fontSize: 12 }}>
+                    {p.slug ? `/asililiqlar/${p.slug}` : '/'}
+                  </code>
+                </td>
+                <td>
+                  {p.levelLabel ? (
+                    <span className={`tag-pill ${p.level === 'yuksek' ? 'pill-danger' : p.level === 'orta' ? 'pill-muted' : 'pill-success'}`}>
+                      {p.levelLabel}
+                    </span>
+                  ) : <span style={{ color: 'var(--muted)', fontSize: 12 }}>—</span>}
                 </td>
                 <td>{formatDate(p.updatedAt)}</td>
                 <td>
                   <div className="row-actions">
-                    <a href={`/asililiqlar/${p.slug}`} target="_blank" rel="noopener noreferrer" className="icon-btn" title="Saytda aç">👁</a>
+                    <a href={p.slug ? `/asililiqlar/${p.slug}` : '/'} target="_blank" rel="noopener noreferrer" className="icon-btn" title="Saytda aç">👁</a>
                     <button className="icon-btn" title="Redaktə et" onClick={() => setModalState({ open: true, page: p })}>✎</button>
-                    <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
+                    {p.type !== 'static' && (
+                      <button className="icon-btn" title="Sil" onClick={() => handleDelete(p)}>🗑</button>
+                    )}
                   </div>
                 </td>
               </tr>

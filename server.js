@@ -110,123 +110,115 @@ function emptyArrayFile() {
 
 const SEED_PAGES = [
   {
-    id: 'page_sosial', slug: 'sosial-media', icon: '📱', title: 'Sosial Media Asılılığı',
+    id: 'page_home', slug: '', icon: '🏠', title: 'Ana Səhifə', type: 'static',
+    level: '', levelLabel: '',
+    shortDesc: 'Tergit.az saytının əsas açılış səhifəsi.',
+    content: '', tips: [],
+    metaTitle: 'Tergit.az — Asılılıqdan azad olmağın yolu',
+    metaDescription: 'Tergit.az sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılığından azad olmaq üçün praktiki məsləhətlər və dəstək platforması.',
+    metaKeywords: 'asılılıq, tergit, azad olmaq, sağalma',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_asililiqlar', slug: 'asililiqlar', icon: '🔗', title: 'Asılılıqlar Səhifəsi', type: 'static',
+    level: '', levelLabel: '',
+    shortDesc: 'Bütün asılılıq növlərinin siyahısı və filtri.',
+    content: '', tips: [],
+    metaTitle: 'Asılılıq Növləri | Tergit.az',
+    metaDescription: 'Sosial media, oyun, siqaret, kofein, fast food, alkoqol və narkotik asılılıqları haqqında məlumat.',
+    metaKeywords: 'asılılıq növləri, asılılıq məlumatı',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_bloq', slug: 'bloq', icon: '📰', title: 'Bloq Səhifəsi', type: 'static',
+    level: '', levelLabel: '',
+    shortDesc: 'Asılılıq mövzusunda məqalələr və xəbərlər.',
+    content: '', tips: [],
+    metaTitle: 'Bloq — Asılılıq Haqqında Məqalələr | Tergit.az',
+    metaDescription: 'Asılılıqdan azad olmaq haqqında ekspert məqalələri, tövsiyələr və uğur hekayələri.',
+    metaKeywords: 'asılılıq bloq, sağalma məqalələri',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_elaqe', slug: 'elaqe', icon: '✉️', title: 'Əlaqə Səhifəsi', type: 'static',
+    level: '', levelLabel: '',
+    shortDesc: 'Bizimlə əlaqə forması və məlumatlar.',
+    content: '', tips: [],
+    metaTitle: 'Əlaqə | Tergit.az',
+    metaDescription: 'Tergit.az ilə əlaqə saxlayın. Suallarınızı və mesajlarınızı göndərin.',
+    metaKeywords: 'əlaqə, tergit əlaqə',
+    heroImage: '', updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'page_sosial', slug: 'sosial-media', icon: '📱', title: 'Sosial Media Asılılığı', type: 'detail',
     level: 'orta', levelLabel: 'ORTA RİSK',
     shortDesc: 'Sosial media platformaları beynimizdə dopamin dövriyyəsini formalaşdıraraq asılılığa yol açır.',
-    content: 'Sosial media asılılığı müasir dünyanın ən geniş yayılmış asılılıq formalarından biridir. Instagram, TikTok, Facebook kimi platformalar istifadəçilərin diqqətini maksimum saxlamaq üçün xüsusi alqoritmlər tətbiq edir.\n\nBeynimizdəki dopamin sistemi hər "bəyənmə" və ya bildirişlə aktivləşir — bu isə müsbət güclənmə dövriyyəsi yaradır. Zamanla beyin daha çox stimula ehtiyac duyur.\n\nSosial media asılılığının əlamətləri: gündə 4+ saat ekran vaxtı, narahatlıq hissi olmadan telefonsuz qala bilməmək, sosial müqayisə nəticəsində özünə hörmətin azalması, real münasibətlərin zəifləməsi.',
-    tips: [
-      'Telefon istifadə vaxtını izləyən tətbiq quraşdırın (Screen Time, Digital Wellbeing)',
-      'Bildirişləri söndürün — yalnız vacib tətbiqlər üçün saxlayın',
-      'Yatmadan 1 saat əvvəl telefonu bağlayın',
-      'Yeməkdə, söhbətdə telefonsuz olun',
-      'Sosial mediaya alternativ hobbilər tapın — kitab, idman, yaradıcılıq'
-    ],
-    metaTitle: 'Sosial Media Asılılığı — Əlamətlər, Səbəblər və Həll Yolları | Tergit.az',
-    metaDescription: 'Sosial media asılılığından azad olmaq üçün praktiki tövsiyələr, əlamətlər və müalicə yolları. Ekran vaxtınızı azaldın.',
-    metaKeywords: 'sosial media asılılığı, instagram asılılığı, telefon asılılığı, ekran vaxtı, tiktok asılılığı',
+    content: 'Sosial media asılılığı müasir dünyanın ən geniş yayılmış asılılıq formalarından biridir.\n\nBeynimizdəki dopamin sistemi hər bəyənmə ilə aktivləşir — müsbət güclənmə dövriyyəsi yaradır.\n\nƏlamətlər: gündə 4+ saat ekran vaxtı, telefonsuz qala bilməmək, özünə hörmətin azalması.',
+    tips: ['Telefon istifadə vaxtını izləyən tətbiq quraşdırın', 'Bildirişləri söndürün', 'Yatmadan 1 saat əvvəl telefonu bağlayın', 'Yeməkdə telefonsuz olun', 'Alternativ hobbilər tapın'],
+    metaTitle: 'Sosial Media Asılılığı | Tergit.az',
+    metaDescription: 'Sosial media asılılığından azad olmaq üçün praktiki tövsiyələr.',
+    metaKeywords: 'sosial media asılılığı, instagram asılılığı, telefon asılılığı',
     heroImage: '', updatedAt: new Date().toISOString()
   },
   {
-    id: 'page_oyun', slug: 'oyun', icon: '🎮', title: 'Oyun (Gaming) Asılılığı',
+    id: 'page_oyun', slug: 'oyun', icon: '🎮', title: 'Oyun Asılılığı', type: 'detail',
     level: 'orta', levelLabel: 'ORTA RİSK',
     shortDesc: 'Video oyunlar güclü ödül mexanizmləri vasitəsilə kompulsiv istifadəyə sürükləyir.',
-    content: 'Oyun asılılığı 2018-ci ildən etibarən DSM-5 (Psixiatriya Diaqnostika Kitabçası) tərəfindən rəsmi pozuntu kimi tanınıb. Video oyunlar xüsusi olaraq motivasiya psixologiyasına əsaslanan mükəmməl ödül sistemi ilə layihələndirilir.\n\nBaşarı hissi, rəqabət, sosial mənsub olmaq, fasilə olmadan oxunan süjet — bunlar oyunçunu məşğul saxlayan əsas elementlərdir. MMO (massively multiplayer online) oyunlar xüsusilə güclü asılılıq potensialına malikdir.\n\nDünya Səhiyyə Təşkilatı məlumatlarına görə oyunçuların 3-4%-i klinik asılılıq meyarlarına cavab verir.',
-    tips: [
-      'Gündəlik oyun vaxtı limiti qoyun (maks. 2 saat)',
-      'Gecə yarısından sonra oynamayın',
-      'Hər saat başı 10 dəqiqə fasilə verin',
-      'Real həyatda sosial fəaliyyətlərə zaman ayırın',
-      'Oyun dostlarınızla real həyatda da görüşün'
-    ],
-    metaTitle: 'Oyun Asılılığı — Əlamətlər və Müalicə | Tergit.az',
-    metaDescription: 'Video oyun asılılığından necə qurtulmaq olar? Əlamətlər, səbəblər və praktiki tövsiyələr.',
-    metaKeywords: 'oyun asılılığı, gaming asılılığı, video oyun, kompüter oyun asılılığı',
-    heroImage: '', updatedAt: new Date().toISOString()
+    content: 'Oyun asılılığı 2018-ci ildən DSM-5 tərəfindən rəsmi pozuntu kimi tanınıb.\n\nVideo oyunlar motivasiya psixologiyasına əsaslanan ödül sistemi ilə layihələndirilir.\n\nMMO oyunlar xüsusilə güclü asılılıq potensialına malikdir.',
+    tips: ['Gündəlik oyun vaxtı limiti qoyun', 'Gecə yarısından sonra oynamayın', 'Hər saat başı 10 dəqiqə fasilə verin', 'Real həyatda sosial fəaliyyətlərə zaman ayırın', 'Oyun dostlarınızla real həyatda görüşün'],
+    metaTitle: 'Oyun Asılılığı | Tergit.az',
+    metaDescription: 'Video oyun asılılığından necə qurtulmaq olar?',
+    metaKeywords: 'oyun asılılığı, gaming asılılığı', heroImage: '', updatedAt: new Date().toISOString()
   },
   {
-    id: 'page_siqaret', slug: 'siqaret', icon: '🚬', title: 'Siqaret (Nikotin) Asılılığı',
+    id: 'page_siqaret', slug: 'siqaret', icon: '🚬', title: 'Siqaret Asılılığı', type: 'detail',
     level: 'yuksek', levelLabel: 'YÜKSƏK RİSK',
     shortDesc: 'Nikotin bir neçə saniyə ərzində beyinə çataraq güclü fiziki və psixoloji asılılıq yaradır.',
-    content: 'Siqaret asılılığı həm fiziki (nikotin), həm də psixoloji komponentlərə malikdir. Nikotin tüstü vasitəsilə qan dövranına keçdikdən sonra 10-20 saniyə ərzində beyinə çatır — bu sürət heroindən belə daha sürətlidir.\n\nNikotin dopamin, serotonin və norepinefrin kimi neyrotransmitterləri stimullaşdırır. Zamanla beyin bu stimulasiyaya öyrəşir və onsuz normal işləyə bilmir.\n\nDünyada hər il 8 milyondan çox insan tütün istifadəsinə bağlı xəstəliklərdən həyatını itirir. Siqareti tərk etmək çətin olsa da tamamilə mümkündür — 60%-dən çox siqaret çəkən insan ömrü boyu tərk etməyə nail olur.',
-    tips: [
-      'Nikotin əvəzedicilərindən istifadə edin (patch, gum, inhaler)',
-      'Siqareti tərk etmə tarixini müəyyən edin və buna sadiq qalın',
-      'Tetikleyicilər tapın: nə vaxt, harada, hansı hisslə içirsiniz?',
-      'Tibb mütəxəssisindən dəstək alın — dərman müalicəsi mövcuddur',
-      'Siqaret çəkmədən keçirdiginiz hər günü qeyd edin'
-    ],
-    metaTitle: 'Siqareti Tərk Etmək — Praktiki Tövsiyələr | Tergit.az',
-    metaDescription: 'Siqaret asılılığından azad olmaq üçün effektiv üsullar, nikotin əvəziciləri və müalicə yolları.',
-    metaKeywords: 'siqareti tərk etmək, nikotin asılılığı, siqaret asılılığı, tütün asılılığı',
-    heroImage: '', updatedAt: new Date().toISOString()
+    content: 'Siqaret asılılığı həm fiziki həm psixoloji komponentlərə malikdir.\n\nNikotin 10-20 saniyə ərzində beyinə çatır.\n\nDünyada hər il 8 milyondan çox insan tütün istifadəsinə bağlı xəstəliklərdən həyatını itirir.',
+    tips: ['Nikotin əvəzedicilərindən istifadə edin', 'Siqareti tərk etmə tarixini müəyyən edin', 'Tetikleyicilər tapın', 'Tibb mütəxəssisindən dəstək alın', 'Azad günləri qeyd edin'],
+    metaTitle: 'Siqareti Tərk Etmək | Tergit.az',
+    metaDescription: 'Siqaret asılılığından azad olmaq üçün effektiv üsullar.',
+    metaKeywords: 'siqareti tərk etmək, nikotin asılılığı', heroImage: '', updatedAt: new Date().toISOString()
   },
   {
-    id: 'page_kofein', slug: 'kofein', icon: '☕', title: 'Kofein Asılılığı',
+    id: 'page_kofein', slug: 'kofein', icon: '☕', title: 'Kofein Asılılığı', type: 'detail',
     level: 'asagi', levelLabel: 'AŞAĞI RİSK',
-    shortDesc: 'Kofein dünyada ən geniş istifadə olunan psixoaktiv maddədir, asılılıq potensialı aşağıdır.',
-    content: 'Kofein adenozin reseptorlarını bloklayaraq yorğunluq hissini azaldır. Gündə 400mg-a qədər kofein (4 fincan qəhvə) əksər sağlam yetkinlər üçün təhlükəsiz hesab edilir.\n\nAsılılıq, yüksək dozada kofein istifadəsi zamanı beynin kofeinə adaptasiya etməsi nəticəsidnər. Kəskin dayandırıldıqda baş ağrısı, yorğunluq, əhval pozulması kimi geri çəkilmə simptomları 1-2 gün davam edə bilər.\n\nKofein asılılığı digər asılılıqlara nisbətən zərərsizdir, lakin ürək döyünməsi, narahatlıq, yuxu problemlərinə yol aça bilər.',
-    tips: [
-      'Günlük kofein qəbulunu tədricən azaldın (ani dayandırma baş ağrısına yol açır)',
-      'Saat 14:00-dan sonra kofeinli içkilərdən çəkinin',
-      'Kofein mənbəyini müəyyən edin — çay, şokolad, enerji içkiləri',
-      'Su içməyi artırın — dehidrasiya yorğunluğu artırır',
-      'Qısa gəzinti ilə enerji artırın'
-    ],
-    metaTitle: 'Kofein Asılılığı — Əlamətlər və Azaltma Yolları | Tergit.az',
-    metaDescription: 'Kofein asılılığının əlamətləri, qəhvə istifadəsini azaltmaq üçün praktiki tövsiyələr.',
-    metaKeywords: 'kofein asılılığı, qəhvə asılılığı, kofein geri çəkilməsi',
-    heroImage: '', updatedAt: new Date().toISOString()
+    shortDesc: 'Kofein dünyada ən geniş istifadə olunan psixoaktiv maddədir.',
+    content: 'Kofein adenozin reseptorlarını bloklayaraq yorğunluq hissini azaldır.\n\nGündə 400mg-a qədər kofein əksər sağlam yetkinlər üçün təhlükəsizdir.\n\nKəskin dayandırıldıqda baş ağrısı, yorğunluq kimi simptomlar 1-2 gün davam edə bilər.',
+    tips: ['Kofein qəbulunu tədricən azaldın', 'Saat 14:00-dan sonra kofeinli içkilərdən çəkinin', 'Kofein mənbəyini müəyyən edin', 'Su içməyi artırın', 'Qısa gəzinti ilə enerji artırın'],
+    metaTitle: 'Kofein Asılılığı | Tergit.az',
+    metaDescription: 'Kofein asılılığının əlamətləri və azaltma yolları.',
+    metaKeywords: 'kofein asılılığı, qəhvə asılılığı', heroImage: '', updatedAt: new Date().toISOString()
   },
   {
-    id: 'page_fastfood', slug: 'fast-food', icon: '🍔', title: 'Fast Food Asılılığı',
+    id: 'page_fastfood', slug: 'fast-food', icon: '🍔', title: 'Fast Food Asılılığı', type: 'detail',
     level: 'orta', levelLabel: 'ORTA RİSK',
     shortDesc: 'Şəkər, yağ və duz kombinasiyası beyni stimullaşdıraraq kompulsiv yemə davranışına yol açır.',
-    content: 'Fast food məhsulları şəkər, yağ və duzun elmi cəhətdən hesablanmış kombinasiyası ilə hazırlanır — bu "bliss point" adlanır. Bu kombinasiya beyinin ödül sistemini yüksək dozada stimullaşdırır.\n\nTədqiqatlar göstərir ki, yüksək emal edilmiş qidalar narkotik maddələrə bənzər neyrokimyəvi reaksiyalar yaradır. Bəzi insanlarda bu maddi kompulsiv yemə davranışına — yeməyi dayandırmaqda çətinliyə — yol açır.\n\nObesite, diabet, ürək-damar xəstəlikləri ilə birbaşa əlaqəli olan fast food asılılığı həm fiziki, həm psixoloji müdaxilə tələb edir.',
-    tips: [
-      'Tam qidaları artırın: tərəvəz, meyvə, tam taxıl, zülallar',
-      'Fast food restoranlarına getmə tezliyini hər həftə 1-ə endirin',
-      'Evdə yeməkdən həzz alma öyrənin — sadə sağlam reseptlər axtarın',
-      'Emosional yemə tetikleyicilərini tanıyın',
-      'Qida gündəliyi yazın'
-    ],
-    metaTitle: 'Fast Food Asılılığı — Səbəblər və Həll Yolları | Tergit.az',
-    metaDescription: 'Fast food asılılığından azad olmaq, sağlam qidalanma vərdişləri qazanmaq üçün tövsiyələr.',
-    metaKeywords: 'fast food asılılığı, qida asılılığı, kompulsiv yemə, şəkər asılılığı',
-    heroImage: '', updatedAt: new Date().toISOString()
+    content: 'Fast food məhsulları şəkər, yağ və duzun elmi kombinasiyası ilə hazırlanır.\n\nTədqiqatlar göstərir ki, yüksək emal edilmiş qidalar narkotiklərə bənzər reaksiyalar yaradır.\n\nObesite, diabet, ürək-damar xəstəlikləri ilə birbaşa əlaqəlidir.',
+    tips: ['Tam qidaları artırın', 'Fast food tezliyini azaldın', 'Evdə yeməkdən həzz alma öyrənin', 'Emosional yemə tetikleyicilərini tanıyın', 'Qida gündəliyi yazın'],
+    metaTitle: 'Fast Food Asılılığı | Tergit.az',
+    metaDescription: 'Fast food asılılığından azad olmaq üçün tövsiyələr.',
+    metaKeywords: 'fast food asılılığı, qida asılılığı', heroImage: '', updatedAt: new Date().toISOString()
   },
   {
-    id: 'page_alkoqol', slug: 'alkoqol', icon: '🍷', title: 'Alkoqol Asılılığı',
+    id: 'page_alkoqol', slug: 'alkoqol', icon: '🍷', title: 'Alkoqol Asılılığı', type: 'detail',
     level: 'yuksek', levelLabel: 'YÜKSƏK RİSK',
-    shortDesc: 'Alkoqol mərkəzi sinir sistemini birbaşa depressiya edir, fiziki asılılıq ciddi tibbi müdaxilə tələb edir.',
-    content: 'Alkoqol asılılığı (alkoqolizm) dünyada ən geniş yayılmış madde asılılığı formalarından biridir. Alkoqol GABA reseptorlarını gücləndirir və glutamat reseptorlarını bloklayır — bu relaxasiya hissi verir, lakin zamanla beyin bu effektə öyrəşir.\n\nFiziki alkoqol asılılığı inkişaf etdikdə kəsilmə sindromu həyati təhlükə yarada bilər — tibbi nəzarət olmadan alkoqoldan imtina etmək tövsiyə edilmir.\n\nAlkoqol qaraciyər xəstəliyi, ürək problemləri, sinir sistemi zədələnməsi, psixiatrik pozuntular və onlarca xərçəng növü ilə əlaqəlidir. Erkən müdaxilə son dərəcə vacibdir.',
-    tips: [
-      'Mütləq mütəxəssisə müraciət edin — kəskin imtina təhlükəlidir',
-      'Dəstək qruplarına qoşulun (Anonim Alkoqollar AA)',
-      'Tetikleyicilər müəyyən edin: insanlar, yerlər, hisslər',
-      'Alkoqolsuz içkilərlə əvəz edin — soda, limonlu su',
-      'Ailə dəstəyi çox vacibdir — yaxınlarınızla açıq danışın'
-    ],
-    metaTitle: 'Alkoqol Asılılığı — Müalicə və Dəstək | Tergit.az',
-    metaDescription: 'Alkoqol asılılığının əlamətləri, müalicə yolları, dəstək qrupları haqqında məlumat.',
-    metaKeywords: 'alkoqol asılılığı, alkoqolizm, içki asılılığı, alkoqoldan imtina',
-    heroImage: '', updatedAt: new Date().toISOString()
+    shortDesc: 'Alkoqol mərkəzi sinir sistemini depressiya edir, fiziki asılılıq ciddi tibbi müdaxilə tələb edir.',
+    content: 'Alkoqol asılılığı dünyada ən geniş yayılmış madde asılılığı formalarından biridir.\n\nFiziki alkoqol asılılığı inkişaf etdikdə kəsilmə sindromu həyati təhlükə yarada bilər.\n\nAlkoqol qaraciyər xəstəliyi, ürək problemləri, sinir sistemi zədələnməsi ilə əlaqəlidir.',
+    tips: ['Mütləq mütəxəssisə müraciət edin', 'Dəstək qruplarına qoşulun (AA)', 'Tetikleyicilər müəyyən edin', 'Alkoqolsuz içkilərlə əvəz edin', 'Ailə dəstəyi vacibdir'],
+    metaTitle: 'Alkoqol Asılılığı | Tergit.az',
+    metaDescription: 'Alkoqol asılılığının əlamətləri və müalicə yolları.',
+    metaKeywords: 'alkoqol asılılığı, alkoqolizm', heroImage: '', updatedAt: new Date().toISOString()
   },
   {
-    id: 'page_narkotik', slug: 'narkotik', icon: '💊', title: 'Narkotik Asılılığı',
+    id: 'page_narkotik', slug: 'narkotik', icon: '💊', title: 'Narkotik Asılılığı', type: 'detail',
     level: 'yuksek', levelLabel: 'YÜKSƏK RİSK',
     shortDesc: 'Narkotik asılılığı ən ağır asılılıq formasıdır, mütləq peşəkar tibbi müdaxilə tələb edir.',
-    content: 'Narkotik asılılığı beyin strukturunu fiziki olaraq dəyişdirən xroniki, proqressiv bir xəstəlikdir. Narkotiklər — eroin, kokain, metamfetamin, opioidlər — dopamin sistemini normal stimulların onlarla dəfəsi qədər aktivləşdirir.\n\nZamanla beyin artıq normal həzz hiss edə bilmir — yalnız narkotik istifadəsi zamanı "normal" hiss edir. Bu dövr asılılığın ən dərin fazasıdır.\n\nNarkotik asılılığı ilə mübarizə uzunmüddətli, hərtərəfli müalicə tələb edir: detoks, rehabilitasiya, psixoterapiya, dəstək qrupları. Tək başına bu yola çıxmaq son dərəcə çətindir.',
-    tips: [
-      'Dərhal professional yardım alın — həyatınız risk altındadır',
-      'Tibbi detoks proqramına müraciət edin',
-      'Ailənizi bu prosesə cəlb edin',
-      'Rehabilitasiya mərkəzləri haqqında məlumat alın',
-      'Krizis anında 152 nömrəsinə zəng edin'
-    ],
-    metaTitle: 'Narkotik Asılılığı — Kömək və Müalicə | Tergit.az',
-    metaDescription: 'Narkotik asılılığında professional yardım, müalicə mərhələləri və dəstək haqqında məlumat.',
-    metaKeywords: 'narkotik asılılığı, narkomaniya, narkotikdən imtina, rehabilitasiya',
-    heroImage: '', updatedAt: new Date().toISOString()
+    content: 'Narkotik asılılığı beyin strukturunu fiziki olaraq dəyişdirən xroniki xəstəlikdir.\n\nZamanla beyin artıq normal həzz hiss edə bilmir.\n\nNarkotik asılılığı ilə mübarizə uzunmüddətli hərtərəfli müalicə tələb edir.',
+    tips: ['Dərhal professional yardım alın', 'Tibbi detoks proqramına müraciət edin', 'Ailənizi prosesə cəlb edin', 'Rehabilitasiya mərkəzləri haqqında məlumat alın', 'Krizis anında 152 nömrəsinə zəng edin'],
+    metaTitle: 'Narkotik Asılılığı | Tergit.az',
+    metaDescription: 'Narkotik asılılığında professional yardım haqqında məlumat.',
+    metaKeywords: 'narkotik asılılığı, narkomaniya', heroImage: '', updatedAt: new Date().toISOString()
   }
 ];
 
@@ -246,6 +238,14 @@ async function ensureDataFiles() {
   for (const [filePath, defaultContent] of Object.entries(defaults)) {
     try {
       await fsp.access(filePath, fs.constants.F_OK);
+      // pages.json boş olarsa yenidən seed et
+      if (filePath === FILES.pages) {
+        const existing = await readData(filePath);
+        if (!Array.isArray(existing) || existing.length === 0) {
+          await fsp.writeFile(filePath, defaultContent, 'utf-8');
+          console.log(`[DATA] Yenidən seed edildi: ${path.basename(filePath)}`);
+        }
+      }
     } catch {
       await fsp.writeFile(filePath, defaultContent, 'utf-8');
       console.log(`[DATA] Yaradıldı: ${path.basename(filePath)}`);
