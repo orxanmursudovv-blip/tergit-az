@@ -282,9 +282,14 @@ function AddictionCard({ addiction }) {
       </div>
       <h3>{addiction.name}</h3>
       <p>{addiction.description}</p>
-      <button className="addiction-card__toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        {open ? '▲ Məsləhətləri gizlət' : '▼ Məsləhətlər'}
-      </button>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 14 }}>
+        <button className="addiction-card__toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+          {open ? '▲ Məsləhətləri gizlət' : '▼ Məsləhətlər'}
+        </button>
+        <Link to={`/asililiqlar/${addiction.id}`} className="btn btn-ghost btn-sm">
+          Ətraflı oxu →
+        </Link>
+      </div>
       {open && (
         <ul className="addiction-card__tips">
           {addiction.tips.map((tip, i) => (
@@ -1173,6 +1178,129 @@ function ContactPage() {
    404
    ============================================================ */
 
+/* ============================================================
+   ADDICTION DETAIL PAGE
+   ============================================================ */
+
+function AddictionDetailPage() {
+  const { slug } = useParams();
+  const [page, setPage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/pages/${slug}`);
+        const json = await res.json();
+        if (!active) return;
+        if (json.success) {
+          setPage(json.data);
+        } else {
+          setNotFound(true);
+        }
+      } catch {
+        if (active) setNotFound(true);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { active = false; };
+  }, [slug]);
+
+  if (loading) return <div className="container" style={{ padding: '120px 24px', textAlign: 'center' }}>Yüklənir…</div>;
+  if (notFound || !page) return <NotFoundPage />;
+
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: page.title,
+    description: page.metaDescription || page.shortDesc,
+    url: `${SITE_URL}/asililiqlar/${page.slug}`,
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL }
+  };
+
+  return (
+    <div className="page-enter">
+      <SEO
+        title={page.metaTitle || page.title}
+        description={page.metaDescription || page.shortDesc}
+        keywords={page.metaKeywords || ''}
+        path={`/asililiqlar/${page.slug}`}
+        jsonLd={articleJsonLd}
+      />
+
+      {/* Hero */}
+      <section className="addiction-detail-hero">
+        <div className="container">
+          <Link to="/asililiqlar" className="addiction-detail-back">← Bütün asılılıqlar</Link>
+          <div className="addiction-detail-hero__inner">
+            <div>
+              <span className={`level-pill level-${page.level}`} style={{ marginBottom: 16, display: 'inline-block' }}>
+                {page.levelLabel}
+              </span>
+              <h1 className="addiction-detail-hero__title">
+                {page.icon} {page.title}
+              </h1>
+              <p className="addiction-detail-hero__sub">{page.shortDesc}</p>
+            </div>
+            {page.heroImage && (
+              <img src={page.heroImage} alt={page.title} className="addiction-detail-hero__img" />
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Məzmun */}
+      <section className="section">
+        <div className="container addiction-detail-layout">
+          <div className="addiction-detail-content">
+            <h2>Asılılıq haqqında</h2>
+            {page.content.split('\n\n').map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </div>
+
+          {/* Tövsiyələr */}
+          {page.tips && page.tips.length > 0 && (
+            <div className="addiction-detail-tips">
+              <h3>Praktiki tövsiyələr</h3>
+              <ol className="addiction-detail-tips__list">
+                {page.tips.map((tip, i) => (
+                  <li key={i}>{tip}</li>
+                ))}
+              </ol>
+              <div style={{ marginTop: 24 }}>
+                <Link to="/elaqe" className="btn btn-primary">Kömək al →</Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Digər asılılıqlar */}
+      <section className="section" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', padding: '50px 0' }}>
+        <div className="container">
+          <h3 style={{ marginBottom: 24, color: 'var(--text-dark)' }}>Digər asılılıqlar</h3>
+          <div className="addiction-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px,1fr))' }}>
+            {ADDICTIONS.filter((a) => a.id !== slug).map((a) => (
+              <Link key={a.id} to={`/asililiqlar/${a.id}`} className="addiction-mini-card">
+                <span>{a.icon}</span>
+                <span>{a.name}</span>
+                <span className={`level-pill level-${a.level}`} style={{ fontSize: 10, padding: '2px 8px' }}>
+                  {LEVEL_LABELS[a.level]}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function NotFoundPage() {
   return (
     <div className="page-enter container section" style={{ textAlign: 'center' }}>
@@ -1197,6 +1325,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/asililiqlar" element={<AddictionsPage />} />
+            <Route path="/asililiqlar/:slug" element={<AddictionDetailPage />} />
             <Route path="/bloq" element={<BlogListPage />} />
             <Route path="/bloq/:slug" element={<BlogPostPage />} />
             <Route path="/elaqe" element={<ContactPage />} />
