@@ -773,23 +773,8 @@ function HomePage() {
           <p className="home-section__sub home-section__sub--light" style={{ margin: '0 auto 48px' }}>
             Əgər özün üçün yardıma ehtiyacın varsa, lütfən müraciət et. Bir addım ataraq hər şeyi dəyişdirə bilərsən.
           </p>
-          <div className="home-hotline-cards">
-            {[
-              { icon: '📞', title: 'Xüsusi yardım xətti', desc: 'Azərbaycan Respublikasında narkologiya yardım xətti', num: '152', avail: '24/7 pulsuz' },
-              { icon: '🏥', title: 'Narkologiya Mərkəzi', desc: 'Bakı Narkologiya Mərkəzinə müraciət et', num: '012 595 30 05', avail: 'İş günləri' },
-              { icon: '💬', title: 'Psixoloji dəstək', desc: 'Psixoloji Sağlamlıq Mərkəzi ilə əlaqə', num: '012 492 92 10', avail: 'Həftəiçi' },
-            ].map((h, i) => (
-              <div key={i} className="home-hotline-card">
-                <div className="home-hotline-icon">{h.icon}</div>
-                <h4>{h.title}</h4>
-                <p>{h.desc}</p>
-                <div className="home-hotline-num">{h.num}</div>
-                <div className="home-hotline-avail">{h.avail}</div>
-              </div>
-            ))}
-          </div>
           {/* Sosial media */}
-          <div className="home-social" style={{ marginTop: 48 }}>
+          <div className="home-social">
             <p className="home-social__label">Bizi izləyin</p>
             <div className="home-social__links">
               <a href="https://www.instagram.com/tergit.az" target="_blank" rel="noopener noreferrer" className="home-social-btn home-social-btn--ig">
