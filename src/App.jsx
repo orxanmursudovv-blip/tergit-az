@@ -638,16 +638,16 @@ function HomePage() {
             </div>
             <div className="home-hero__stats">
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">7</span>
+                <span className="home-hero__stat-num">13</span>
                 <span className="home-hero__stat-lbl">Asılılıq növü</span>
               </div>
               <div className="home-hero__stat">
                 <span className="home-hero__stat-num">100%</span>
-                <span className="home-hero__stat-lbl">Pulsuz məlumat</span>
+                <span className="home-hero__stat-lbl">Anonim</span>
               </div>
               <div className="home-hero__stat">
-                <span className="home-hero__stat-num">24/7</span>
-                <span className="home-hero__stat-lbl">Onlayn dəstək</span>
+                <span className="home-hero__stat-num">Praktiki</span>
+                <span className="home-hero__stat-lbl">Tövsiyələr</span>
               </div>
             </div>
           </div>
